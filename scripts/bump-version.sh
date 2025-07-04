@@ -59,8 +59,11 @@ echo -e "${GREEN}✓${NC} Updated VERSION file"
 DATE=$(date +%Y-%m-%d)
 TEMP_FILE=$(mktemp)
 
+# Get the previous version from changelog
+PREV_VERSION=$(grep -E '^\[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | head -1 | sed 's/^\[\([^]]*\)\].*/\1/')
+
 # Read the changelog and insert new version
-awk -v version="$NEW_VERSION" -v date="$DATE" '
+awk -v version="$NEW_VERSION" -v date="$DATE" -v prev_version="$PREV_VERSION" '
     /^## \[Unreleased\]/ {
         print
         print ""
@@ -77,14 +80,12 @@ awk -v version="$NEW_VERSION" -v date="$DATE" '
     }
     /^\[Unreleased\]:/ {
         print "[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v" version "...HEAD"
-        print "[" version "]: https://github.com/douglaslinsmeyer/claude-environment/compare/v" prev_version "...v" version
-        next
-    }
-    /^\[[0-9]+\.[0-9]+\.[0-9]+\]:/ {
-        if (!prev_version) {
-            match($0, /\[([0-9]+\.[0-9]+\.[0-9]+)\]/, arr)
-            prev_version = arr[1]
+        if (prev_version) {
+            print "[" version "]: https://github.com/douglaslinsmeyer/claude-environment/compare/v" prev_version "...v" version
+        } else {
+            print "[" version "]: https://github.com/douglaslinsmeyer/claude-environment/releases/tag/v" version
         }
+        next
     }
     { print }
 ' CHANGELOG.md > "$TEMP_FILE"

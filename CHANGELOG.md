@@ -8,13 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Comprehensive BATS test suite for installation script
+- BATS test suite for version bump script (11 tests)
+
+### Fixed
+- Fixed bump-version.sh script compatibility with macOS awk by removing GNU-specific match() syntax
+
+## [1.1.0] - 2025-01-04
+
+### Added
+- Comprehensive BATS test suite with 43 tests for installation script
 - File validation tests to ensure project integrity
-- CI/CD pipeline with GitHub Actions
+- CI/CD pipeline with GitHub Actions for automated testing
+- Multi-OS testing support (Ubuntu, macOS)
 - Branch protection documentation
 - Test documentation in `tests/README.md`
 - Release automation workflow
 - CHANGELOG.md for tracking project changes
+- CONTRIBUTING.md with development guidelines
+- Version bump script (`scripts/bump-version.sh`)
 
 ### Changed
 - Improved JSON parsing in `check_existing_installation()` to handle spaces in manifest files
@@ -64,5 +75,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/douglaslinsmeyer/claude-environment/releases/tag/v1.0.0
