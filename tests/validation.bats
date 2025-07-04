@@ -151,7 +151,7 @@ setup() {
 # No debug artifacts
 
 @test "no console.log in shell scripts" {
-    run ! grep -r "console\.log" "$PROJECT_ROOT" \
+    ! grep -r "console\.log" "$PROJECT_ROOT" \
         --include="*.sh" \
         --exclude-dir=.git \
         --exclude-dir=node_modules
@@ -159,7 +159,7 @@ setup() {
 
 @test "no TODO comments in shell scripts" {
     # Allow TODOs in markdown documentation but not in scripts
-    run ! grep -r "TODO\|FIXME\|XXX" "$PROJECT_ROOT" \
+    ! grep -r "TODO\|FIXME\|XXX" "$PROJECT_ROOT" \
         --include="*.sh" \
         --exclude-dir=.git \
         --exclude-dir=node_modules \
@@ -181,6 +181,8 @@ setup() {
     [[ -f "$PROJECT_ROOT/.github/workflows/ci.yml" ]]
 }
 
-@test "Release workflow exists" {
-    [[ -f "$PROJECT_ROOT/.github/workflows/release.yml" ]]
+@test "Release functionality exists in CI workflow" {
+    # Release workflow was consolidated into CI workflow
+    grep -q "create-release:" "$PROJECT_ROOT/.github/workflows/ci.yml"
+    grep -q "Create GitHub Release" "$PROJECT_ROOT/.github/workflows/ci.yml"
 }
