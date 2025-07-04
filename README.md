@@ -233,11 +233,7 @@ curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Add your workflows/personas/templates
-4. Update documentation if needed
-5. Submit a pull request
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on how to contribute to this project.
 
 ## License
 
@@ -245,10 +241,4 @@ MIT License - feel free to fork and customize for your needs.
 
 ## Changelog
 
-### v1.0.0
-- Initial release
-- Basic installation script
-- Core workflow categories
-- Persona system
-- Template support
-- Automatic update detection
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.

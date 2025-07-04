@@ -1,0 +1,68 @@
+# Changelog
+
+All notable changes to the Claude Environment project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Comprehensive BATS test suite for installation script
+- File validation tests to ensure project integrity
+- CI/CD pipeline with GitHub Actions
+- Branch protection documentation
+- Test documentation in `tests/README.md`
+- Release automation workflow
+- CHANGELOG.md for tracking project changes
+
+### Changed
+- Improved JSON parsing in `check_existing_installation()` to handle spaces in manifest files
+- Updated test infrastructure to use BATS exclusively
+- Enhanced error handling in version detection
+
+### Fixed
+- Fixed grep pattern to properly parse JSON with or without spaces
+- Fixed BATS tests environment variable inheritance issues
+- Corrected test execution for help and version flags
+
+### Removed
+- Legacy custom test framework files
+- Redundant test implementations
+
+## [1.0.0] - 2024-01-04
+
+### Added
+- Initial release of Claude Environment
+- Comprehensive installation script (`install.sh`) with auto-update support
+- 11 workflow files across three categories:
+  - **Coding**: debug-helper, code-review, refactor-guide, test-writer
+  - **Writing**: blog-post, documentation, email-draft, technical-article  
+  - **Analysis**: data-exploration, research-summary, trend-analysis
+- 5 specialized persona configurations:
+  - Senior Developer
+  - Technical Writer
+  - Data Analyst
+  - Product Manager
+  - Researcher
+- Project-specific CLAUDE.md templates:
+  - Web Development
+  - Data Science
+  - Mobile App Development
+- Project templates:
+  - README template
+  - CLAUDE template  
+  - Project setup guide
+- Installation options:
+  - Global installation (`~/.claude`)
+  - Local installation (`./.claude`)
+  - Component selection flags (`--no-workflows`, `--no-personas`, `--no-templates`)
+  - Dry run mode (`--dry-run`)
+  - Force mode (`--force`)
+- Version tracking and manifest system
+- Automatic update detection and file cleanup
+- Cross-platform support (macOS, Linux/WSL)
+- Comprehensive documentation
+
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/douglaslinsmeyer/claude-environment/releases/tag/v1.0.0
