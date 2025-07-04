@@ -285,7 +285,9 @@ get_component_files() {
             ;;
     esac
 
-    printf '%s\n' "${files[@]}"
+    if [[ ${#files[@]} -gt 0 ]]; then
+        printf '%s\n' "${files[@]}"
+    fi
 }
 
 # Install component files
