@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - BATS test suite for version bump script (11 tests)
+- ShellCheck integration in test suite for linting shell scripts (10 tests)
 - System requirements documentation in README
 - Trap for temporary file cleanup in bump-version.sh
 
@@ -20,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed bump-version.sh script compatibility with macOS awk by removing GNU-specific match() syntax
 - Fixed version mismatch between VERSION file (1.1.0) and manifest.json (was 1.0.0)
+- Fixed install.sh output capture issue by redirecting print functions to stderr
+- Fixed all ShellCheck warnings (SC2155) by declaring and assigning variables separately
+- Fixed BATS test setup to work correctly in GitHub Actions environment
 
 ## [1.1.0] - 2025-01-04
 

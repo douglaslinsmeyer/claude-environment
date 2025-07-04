@@ -7,14 +7,14 @@ setup() {
     export TEST_DIR="$BATS_TEST_TMPDIR/bump-version-test"
     mkdir -p "$TEST_DIR"
     cd "$TEST_DIR"
-    
+
     # Copy the bump version script
     cp "$BATS_TEST_DIRNAME/../scripts/bump-version.sh" ./bump-version.sh
     chmod +x ./bump-version.sh
-    
+
     # Create test VERSION file
     echo "1.2.3" > VERSION
-    
+
     # Create test CHANGELOG.md
     cat > CHANGELOG.md << 'EOF'
 # Changelog
@@ -46,14 +46,14 @@ teardown() {
 
 @test "bump patch version" {
     run ./bump-version.sh patch
-    
+
     [ "$status" -eq 0 ]
     [[ "$output" == *"Bumping version from 1.2.3 to 1.2.4"* ]]
-    
+
     # Check VERSION file
     version_content=$(cat VERSION)
     [ "$version_content" = "1.2.4" ]
-    
+
     # Check CHANGELOG.md has new version section
     changelog_content=$(cat CHANGELOG.md)
     [[ "$changelog_content" == *"## [1.2.4]"* ]]
@@ -63,14 +63,14 @@ teardown() {
 
 @test "bump minor version" {
     run ./bump-version.sh minor
-    
+
     [ "$status" -eq 0 ]
     [[ "$output" == *"Bumping version from 1.2.3 to 1.3.0"* ]]
-    
+
     # Check VERSION file
     version_content=$(cat VERSION)
     [ "$version_content" = "1.3.0" ]
-    
+
     # Check CHANGELOG.md
     changelog_content=$(cat CHANGELOG.md)
     [[ "$changelog_content" == *"## [1.3.0]"* ]]
@@ -78,14 +78,14 @@ teardown() {
 
 @test "bump major version" {
     run ./bump-version.sh major
-    
+
     [ "$status" -eq 0 ]
     [[ "$output" == *"Bumping version from 1.2.3 to 2.0.0"* ]]
-    
+
     # Check VERSION file
     version_content=$(cat VERSION)
     [ "$version_content" = "2.0.0" ]
-    
+
     # Check CHANGELOG.md
     changelog_content=$(cat CHANGELOG.md)
     [[ "$changelog_content" == *"## [2.0.0]"* ]]
@@ -93,17 +93,17 @@ teardown() {
 
 @test "default to patch when no argument" {
     run ./bump-version.sh
-    
+
     [ "$status" -eq 0 ]
     [[ "$output" == *"Bumping version from 1.2.3 to 1.2.4"* ]]
-    
+
     version_content=$(cat VERSION)
     [ "$version_content" = "1.2.4" ]
 }
 
 @test "invalid bump type shows error" {
     run ./bump-version.sh invalid
-    
+
     [ "$status" -eq 1 ]
     [[ "$output" == *"Error: Invalid bump type 'invalid'"* ]]
     [[ "$output" == *"Usage:"* ]]
@@ -111,9 +111,9 @@ teardown() {
 
 @test "preserves unreleased content in changelog" {
     run ./bump-version.sh patch
-    
+
     [ "$status" -eq 0 ]
-    
+
     # Check that unreleased content is preserved
     changelog_content=$(cat CHANGELOG.md)
     [[ "$changelog_content" == *"## [Unreleased]"* ]]
@@ -123,15 +123,15 @@ teardown() {
 
 @test "changelog sections are properly formatted" {
     run ./bump-version.sh patch
-    
+
     [ "$status" -eq 0 ]
-    
+
     # Check that new version section has all subsections
     changelog_content=$(cat CHANGELOG.md)
-    
+
     # Check that the new version was added
     [[ "$changelog_content" == *"## [1.2.4] -"* ]]
-    
+
     # Check that all standard sections are added after the new version
     [[ "$changelog_content" == *"## [1.2.4] -"*"### Added"* ]]
     [[ "$changelog_content" == *"## [1.2.4] -"*"### Changed"* ]]
@@ -141,9 +141,9 @@ teardown() {
 
 @test "date format in changelog is correct" {
     run ./bump-version.sh patch
-    
+
     [ "$status" -eq 0 ]
-    
+
     # Check date format (YYYY-MM-DD)
     changelog_content=$(cat CHANGELOG.md)
     current_date=$(date +%Y-%m-%d)
@@ -152,12 +152,12 @@ teardown() {
 
 @test "handles version with zeros correctly" {
     echo "1.0.0" > VERSION
-    
+
     run ./bump-version.sh patch
-    
+
     [ "$status" -eq 0 ]
     [[ "$output" == *"Bumping version from 1.0.0 to 1.0.1"* ]]
-    
+
     version_content=$(cat VERSION)
     [ "$version_content" = "1.0.1" ]
 }
@@ -196,9 +196,9 @@ All notable changes to this project will be documented in this file.
 EOF
 
     run ./bump-version.sh patch
-    
+
     [ "$status" -eq 0 ]
-    
+
     # Check all links are updated correctly
     changelog_content=$(cat CHANGELOG.md)
     [[ "$changelog_content" == *"[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.2.4...HEAD"* ]]
@@ -209,9 +209,9 @@ EOF
 
 @test "next steps output is complete" {
     run ./bump-version.sh patch
-    
+
     [ "$status" -eq 0 ]
-    
+
     # Check for all expected next steps
     [[ "$output" == *"Next steps:"* ]]
     [[ "$output" == *"1. Update the Unreleased section"* ]]

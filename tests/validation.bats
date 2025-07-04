@@ -4,7 +4,8 @@
 # Ensures all project files meet quality standards
 
 setup() {
-    export PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
+    export PROJECT_ROOT
+    PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
 }
 
 # Markdown file validation
@@ -40,7 +41,7 @@ setup() {
     if command -v jq >/dev/null 2>&1; then
         version=$(jq -r '.version' "$PROJECT_ROOT/manifest.json")
         [[ "$version" != "null" ]]
-        
+
         # Check components exist
         components=$(jq -r '.components | keys[]' "$PROJECT_ROOT/manifest.json" 2>/dev/null)
         [[ "$components" == *"workflows"* ]]
@@ -91,7 +92,7 @@ setup() {
 
 @test "README.md has required sections" {
     readme_content=$(cat "$PROJECT_ROOT/README.md")
-    
+
     [[ "$readme_content" == *"## Quick Install"* ]]
     [[ "$readme_content" == *"## What Gets Installed"* ]]
     [[ "$readme_content" == *"## Installation Options"* ]]
@@ -102,13 +103,13 @@ setup() {
 @test "all workflow files have proper structure" {
     for file in "$PROJECT_ROOT"/workflows/*/*.md; do
         [[ ! -f "$file" ]] && continue
-        
+
         content=$(cat "$file")
         basename=$(basename "$file")
-        
+
         # Check for title
         [[ "$content" == *"# "* ]] || fail "No title in workflow: $basename"
-        
+
         # Check for sections
         [[ "$content" == *"## "* ]] || fail "No sections in workflow: $basename"
     done
@@ -119,13 +120,13 @@ setup() {
 @test "all persona files have proper structure" {
     for file in "$PROJECT_ROOT"/personas/*.md; do
         [[ ! -f "$file" ]] && continue
-        
+
         content=$(cat "$file")
         basename=$(basename "$file")
-        
+
         # Check for title
         [[ "$content" == *"# "* ]] || fail "No title in persona: $basename"
-        
+
         # Check for sections
         [[ "$content" == *"## "* ]] || fail "No sections in persona: $basename"
     done
@@ -137,7 +138,7 @@ setup() {
     if command -v jq >/dev/null 2>&1; then
         # Get all file references from manifest
         files=$(jq -r '.components[].files[]' "$PROJECT_ROOT/manifest.json" 2>/dev/null | sort | uniq)
-        
+
         while IFS= read -r file; do
             [[ -z "$file" ]] && continue
             [[ -f "$PROJECT_ROOT/$file" ]] || fail "File in manifest does not exist: $file"
@@ -150,7 +151,7 @@ setup() {
 # No debug artifacts
 
 @test "no console.log in shell scripts" {
-    ! grep -r "console\.log" "$PROJECT_ROOT" \
+    run ! grep -r "console\.log" "$PROJECT_ROOT" \
         --include="*.sh" \
         --exclude-dir=.git \
         --exclude-dir=node_modules
@@ -158,7 +159,7 @@ setup() {
 
 @test "no TODO comments in shell scripts" {
     # Allow TODOs in markdown documentation but not in scripts
-    ! grep -r "TODO\|FIXME\|XXX" "$PROJECT_ROOT" \
+    run ! grep -r "TODO\|FIXME\|XXX" "$PROJECT_ROOT" \
         --include="*.sh" \
         --exclude-dir=.git \
         --exclude-dir=node_modules \

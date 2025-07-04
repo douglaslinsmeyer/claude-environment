@@ -47,21 +47,24 @@ FAILED_TESTS=0
 run_bats_file() {
     local test_name="$1"
     local test_file="$2"
-    
+
     echo -e "\n${YELLOW}Running: $test_name${NC}"
     echo -e "${YELLOW}────────────────────────────────────────${NC}"
-    
+
     # Run bats with TAP output for better parsing
     if output=$(bats "$test_file" 2>&1); then
         # Extract test counts from output
-        local tests_run=$(echo "$output" | grep -E '^1\.\.[0-9]+' | sed 's/1\.\.//')
-        local tests_passed=$(echo "$output" | grep -c '^ok ')
-        local tests_failed=$(echo "$output" | grep -c '^not ok ')
-        
+        local tests_run
+        tests_run=$(echo "$output" | grep -E '^1\.\.[0-9]+' | sed 's/1\.\.//')
+        local tests_passed
+        tests_passed=$(echo "$output" | grep -c '^ok ')
+        local tests_failed
+        tests_failed=$(echo "$output" | grep -c '^not ok ')
+
         TOTAL_TESTS=$((TOTAL_TESTS + tests_run))
         PASSED_TESTS=$((PASSED_TESTS + tests_passed))
         FAILED_TESTS=$((FAILED_TESTS + tests_failed))
-        
+
         if [[ $tests_failed -eq 0 ]]; then
             echo -e "${GREEN}✓ All tests passed ($tests_passed/$tests_run)${NC}"
         else
@@ -94,7 +97,7 @@ for bats_file in "$TEST_DIR"/*.bats; do
     [[ ! -f "$bats_file" ]] && continue
     [[ "$bats_file" == *"validation.bats" ]] && continue
     [[ "$bats_file" == *"install.bats" ]] && continue
-    
+
     basename=$(basename "$bats_file" .bats)
     run_bats_file "$basename Tests" "$bats_file"
 done

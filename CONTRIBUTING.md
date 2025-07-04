@@ -41,9 +41,20 @@ brew install bats-core  # macOS
 # or
 sudo apt-get install bats  # Ubuntu/Debian
 
+# Install ShellCheck for linting
+brew install shellcheck  # macOS
+# or
+sudo apt-get install shellcheck  # Ubuntu/Debian
+
 # Run tests
 bash tests/run_bats_tests.sh
 ```
+
+The test suite now includes:
+- File validation tests
+- Installation tests
+- Version bump script tests
+- ShellCheck linting for all shell scripts
 
 ### 4. Commit Your Changes
 
