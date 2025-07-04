@@ -7,10 +7,12 @@
 setup() {
     # Get the directory where this test file is located
     export BATS_TEST_DIRNAME="${BATS_TEST_DIRNAME:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
-    export ORIGINAL_DIR="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
+    export ORIGINAL_DIR
+    ORIGINAL_DIR="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
 
     # Create a temporary directory for each test
-    export TEST_DIR="$(mktemp -d -t claude-env-test-XXXXXX)"
+    export TEST_DIR
+    TEST_DIR="$(mktemp -d -t claude-env-test-XXXXXX)"
     cd "$TEST_DIR"
 
     # Source the install script with testing flag
@@ -111,25 +113,37 @@ EOF
 }
 
 @test "get_component_files returns workflow files" {
-    files=($(get_component_files "workflows"))
+    local files=()
+    while IFS= read -r line; do
+        files+=("$line")
+    done < <(get_component_files "workflows")
     [[ ${#files[@]} -gt 0 ]]
     [[ "${files[0]}" == *"workflows/"* ]]
 }
 
 @test "get_component_files returns persona files" {
-    files=($(get_component_files "personas"))
+    files=()
+    while IFS= read -r line; do
+        files+=("$line")
+    done < <(get_component_files "personas")
     [[ ${#files[@]} -gt 0 ]]
     [[ "${files[0]}" == *"personas/"* ]]
 }
 
 @test "get_component_files returns claude files" {
-    files=($(get_component_files "claude-files"))
+    files=()
+    while IFS= read -r line; do
+        files+=("$line")
+    done < <(get_component_files "claude-files")
     [[ ${#files[@]} -gt 0 ]]
     [[ "${files[0]}" == *"claude-files/"* ]]
 }
 
 @test "get_component_files returns template files" {
-    files=($(get_component_files "templates"))
+    files=()
+    while IFS= read -r line; do
+        files+=("$line")
+    done < <(get_component_files "templates")
     [[ ${#files[@]} -gt 0 ]]
     [[ "${files[0]}" == *"templates/"* ]]
 }

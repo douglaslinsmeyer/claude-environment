@@ -311,8 +311,10 @@ install_component() {
     esac
 
     # Get list of files for this component
-    local files
-    mapfile -t files < <(get_component_files "$component")
+    local files=()
+    while IFS= read -r file; do
+        [[ -n "$file" ]] && files+=("$file")
+    done < <(get_component_files "$component")
 
     # Special handling for CLAUDE.md
     if [[ "$component" == "claude-files" ]]; then

@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed install.sh output capture issue by redirecting print functions to stderr
 - Fixed all ShellCheck warnings (SC2155) by declaring and assigning variables separately
 - Fixed BATS test setup to work correctly in GitHub Actions environment
+- Fixed macOS compatibility by replacing mapfile with portable while/read loop
+- Fixed broken pipe errors in get_component_files by checking array length
 
 ## [1.1.0] - 2025-01-04
 

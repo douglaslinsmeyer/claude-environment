@@ -46,7 +46,24 @@ setup() {
 }
 
 @test "all BATS test files pass ShellCheck" {
-    skip "BATS files have special syntax that ShellCheck doesn't fully understand"
+    command -v shellcheck >/dev/null 2>&1 || skip "ShellCheck not installed"
+
+    # Find all .bats files and check them with appropriate exclusions
+    local failed=0
+    while IFS= read -r -d '' bats_file; do
+        # Run ShellCheck with BATS-specific exclusions
+        if ! shellcheck -x \
+            -e SC2030,SC2031 \
+            -e SC2317 \
+            -e SC2164 \
+            "$bats_file" >/dev/null 2>&1; then
+            echo "ShellCheck failed for: $bats_file" >&2
+            shellcheck -x -e SC2030,SC2031 -e SC2317 -e SC2164 "$bats_file" >&2
+            ((failed++))
+        fi
+    done < <(find "$PROJECT_ROOT/tests" -name "*.bats" -type f -print0)
+
+    [ "$failed" -eq 0 ]
 }
 
 @test "all shell scripts have proper shebang" {
