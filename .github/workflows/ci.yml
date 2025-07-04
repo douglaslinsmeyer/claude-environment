@@ -251,21 +251,21 @@ jobs:
             ' CHANGELOG.md)
             
             # Create release body
-            cat > release-body.md << EOF
-## Installation
-
-\`\`\`bash
-curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/v$current_version/install.sh | bash
-\`\`\`
-
-## What's Changed
-
-$changelog
-
----
-
-**Full Changelog**: https://github.com/douglaslinsmeyer/claude-environment/blob/main/CHANGELOG.md
-EOF
+            {
+              echo "## Installation"
+              echo ""
+              echo '```bash'
+              echo "curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/v$current_version/install.sh | bash"
+              echo '```'
+              echo ""
+              echo "## What's Changed"
+              echo ""
+              echo "$changelog"
+              echo ""
+              echo "---"
+              echo ""
+              echo "**Full Changelog**: https://github.com/douglaslinsmeyer/claude-environment/blob/main/CHANGELOG.md"
+            } > release-body.md
             
             # Create the release
             gh release create "v$current_version" \
