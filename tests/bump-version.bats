@@ -218,8 +218,9 @@ EOF
     [[ "$output" == *"2. Commit the version bump:"* ]]
     [[ "$output" == *"git add VERSION CHANGELOG.md"* ]]
     [[ "$output" == *"git commit -m \"chore: bump version to 1.2.4\""* ]]
-    [[ "$output" == *"3. Create and push a tag:"* ]]
-    [[ "$output" == *"git tag -a v1.2.4"* ]]
+    [[ "$output" == *"3. Push to main:"* ]]
     [[ "$output" == *"git push origin main"* ]]
-    [[ "$output" == *"git push origin v1.2.4"* ]]
+    [[ "$output" == *"The CI/CD pipeline will automatically:"* ]]
+    [[ "$output" == *"Run all tests"* ]]
+    [[ "$output" == *"create tag v1.2.4"* ]]
 }
