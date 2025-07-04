@@ -7,18 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-07-03
+
 ### Added
 - BATS test suite for version bump script (11 tests)
 - ShellCheck integration in test suite for linting shell scripts (10 tests)
 - System requirements documentation in README
 - Trap for temporary file cleanup in bump-version.sh
+- Automated release process - CI creates tags and releases after tests pass
 
 ### Changed
 - Updated Python minimum version from 3.8 to 3.9 in project-setup.md (Python 3.8 reached EOL in October 2024)
 - Updated Node.js Docker images from version 18 to 22 (current LTS) in project-setup.md
 - Pinned ludeeus/action-shellcheck to version 2.0.0 instead of using @master
-- Improved release process - tags are automatically created after all CI tests pass on main branch
-- Release workflow triggered by tags ensures only tested code is released
+- Simplified release process - CI now creates both tags and releases after all tests pass
+- Removed separate release workflow, everything handled in single CI pipeline
 
 ### Fixed
 - Fixed bump-version.sh script compatibility with macOS awk by removing GNU-specific match() syntax
@@ -91,6 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/douglaslinsmeyer/claude-environment/releases/tag/v1.0.0
