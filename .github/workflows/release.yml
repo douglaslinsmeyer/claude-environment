@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    name: Run Tests
+    uses: ./.github/workflows/ci.yml
+
+  create-release:
+    name: Create Release
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        
+      - name: Verify VERSION file matches tag
+        run: |
+          file_version=$(cat VERSION)
+          tag_version="${{ steps.get_version.outputs.VERSION }}"
+          
+          if [[ "$file_version" != "$tag_version" ]]; then
+            echo "ERROR: VERSION file ($file_version) does not match tag ($tag_version)"
+            exit 1
+          fi
+          
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          # Get commits since last tag
+          prev_tag=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [[ -n "$prev_tag" ]]; then
+            echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+            echo "## What's Changed" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            git log --pretty=format:"* %s (%an)" "$prev_tag"..HEAD >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "RELEASE_NOTES=Initial release" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## Installation
+            
+            ```bash
+            curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/v${{ steps.get_version.outputs.VERSION }}/install.sh | bash
+            ```
+            
+            ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+            
+            ## Full Changelog
+            
+            See [all commits](https://github.com/douglaslinsmeyer/claude-environment/compare/${{ github.event.before }}...${{ github.ref }})
+          draft: false
+          prerelease: false

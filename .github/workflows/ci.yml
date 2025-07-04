@@ -1,0 +1,191 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  validate-files:
+    name: Validate Files
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Validate markdown files
+        run: |
+          echo "Checking for empty markdown files..."
+          find . -name "*.md" -type f -empty -print -exec false {} +
+          
+      - name: Validate JSON files
+        run: |
+          echo "Validating manifest.json..."
+          jq empty manifest.json
+          
+      - name: Check file permissions
+        run: |
+          echo "Checking install.sh is executable..."
+          test -x install.sh
+          
+      - name: Install BATS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+          
+      - name: Run BATS validation tests
+        run: |
+          chmod +x tests/*.sh tests/*.bats
+          bats tests/validation.bats
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          check_together: 'yes'
+          scandir: '.'
+          format: 'gcc'
+
+  bats-tests:
+    name: BATS Tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Install BATS
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y bats
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            brew install bats-core
+          fi
+        
+      - name: Run all BATS tests
+        run: |
+          chmod +x tests/*.sh tests/*.bats
+          bash tests/run_bats_tests.sh
+
+  test-installation:
+    name: Test Installation
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        install-type: [global, local]
+        
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Test installation
+        run: |
+          # Set up test environment
+          if [[ "${{ matrix.install-type }}" == "global" ]]; then
+            export HOME="$GITHUB_WORKSPACE/test-home"
+            mkdir -p "$HOME"
+            INSTALL_FLAG=""
+          else
+            INSTALL_FLAG="--local"
+          fi
+          
+          # Run installation
+          bash install.sh $INSTALL_FLAG --force
+          
+          # Verify installation
+          if [[ "${{ matrix.install-type }}" == "global" ]]; then
+            CLAUDE_DIR="$HOME/.claude"
+          else
+            CLAUDE_DIR=".claude"
+          fi
+          
+          # Check key files exist
+          test -d "$CLAUDE_DIR"
+          test -f "$CLAUDE_DIR/CLAUDE.md"
+          test -f "$CLAUDE_DIR/.claude-install-manifest"
+          test -d "$CLAUDE_DIR/workflows"
+          test -d "$CLAUDE_DIR/personas"
+          test -d "$CLAUDE_DIR/templates"
+          
+          echo "Installation test passed!"
+
+  test-update:
+    name: Test Update Scenario
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Test update scenario
+        run: |
+          export HOME="$GITHUB_WORKSPACE/test-home"
+          mkdir -p "$HOME"
+          
+          # First installation
+          bash install.sh --force
+          
+          # Verify first installation
+          test -f "$HOME/.claude/CLAUDE.md"
+          
+          # Modify a file
+          echo "Modified" > "$HOME/.claude/CLAUDE.md"
+          
+          # Run update
+          bash install.sh --force
+          
+          # Verify file was restored
+          ! grep -q "Modified" "$HOME/.claude/CLAUDE.md"
+          
+          echo "Update test passed!"
+
+  test-dry-run:
+    name: Test Dry Run
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Test dry run
+        run: |
+          export HOME="$GITHUB_WORKSPACE/test-home"
+          mkdir -p "$HOME"
+          
+          # Run dry run
+          output=$(bash install.sh --dry-run 2>&1)
+          
+          # Verify no files were created
+          test ! -d "$HOME/.claude"
+          
+          # Verify dry run output
+          echo "$output" | grep -q "DRY RUN"
+          echo "$output" | grep -q "Would"
+          
+          echo "Dry run test passed!"
+
+  all-tests:
+    name: All Tests
+    needs: [validate-files, shellcheck, bats-tests, test-installation, test-update, test-dry-run]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: All tests passed
+        run: echo "All tests passed successfully! ✅"

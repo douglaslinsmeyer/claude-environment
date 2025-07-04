@@ -136,7 +136,7 @@ show_version() {
     
     local install_dir=$(get_install_dir)
     if [[ -f "$install_dir/$MANIFEST_FILE" ]]; then
-        local installed_version=$(grep -o '"version":"[^"]*"' "$install_dir/$MANIFEST_FILE" | cut -d'"' -f4)
+        local installed_version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$install_dir/$MANIFEST_FILE" | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
         echo "Installed version: $installed_version"
     else
         echo "Not currently installed"
@@ -149,7 +149,7 @@ check_existing_installation() {
     local manifest_path="$install_dir/$MANIFEST_FILE"
     
     if [[ -f "$manifest_path" ]]; then
-        local installed_version=$(grep -o '"version":"[^"]*"' "$manifest_path" | cut -d'"' -f4 2>/dev/null || echo "unknown")
+        local installed_version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$manifest_path" | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' 2>/dev/null || echo "unknown")
         echo "$installed_version"
     else
         echo ""
@@ -446,5 +446,7 @@ main() {
     fi
 }
 
-# Run main function with all arguments
-main "$@"
+# Run main function with all arguments (unless being sourced for testing)
+if [[ "${CLAUDE_ENV_TESTING:-false}" != "true" ]]; then
+    main "$@"
+fi
