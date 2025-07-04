@@ -59,6 +59,9 @@ echo -e "${GREEN}✓${NC} Updated VERSION file"
 DATE=$(date +%Y-%m-%d)
 TEMP_FILE=$(mktemp)
 
+# Ensure cleanup on exit
+trap 'rm -f "$TEMP_FILE"' EXIT
+
 # Get the previous version from changelog
 PREV_VERSION=$(grep -E '^\[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | head -1 | sed 's/^\[\([^]]*\)\].*/\1/')
 

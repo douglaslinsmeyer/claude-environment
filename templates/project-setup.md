@@ -84,7 +84,7 @@ setup(
     name="my-project",
     version="0.1.0",
     packages=find_packages(),
-    python_requires=">=3.8",
+    python_requires=">=3.9",
 )
 EOF
 ```
@@ -291,13 +291,13 @@ module.exports = {
 **Dockerfile (Node.js)**
 ```dockerfile
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 
 # Runtime stage
-FROM node:18-alpine
+FROM node:22-alpine
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY . .

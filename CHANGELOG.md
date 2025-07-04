@@ -9,9 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - BATS test suite for version bump script (11 tests)
+- System requirements documentation in README
+- Trap for temporary file cleanup in bump-version.sh
+
+### Changed
+- Updated Python minimum version from 3.8 to 3.9 in project-setup.md (Python 3.8 reached EOL in October 2024)
+- Updated Node.js Docker images from version 18 to 22 (current LTS) in project-setup.md
+- Pinned ludeeus/action-shellcheck to version 2.0.0 instead of using @master
 
 ### Fixed
 - Fixed bump-version.sh script compatibility with macOS awk by removing GNU-specific match() syntax
+- Fixed version mismatch between VERSION file (1.1.0) and manifest.json (was 1.0.0)
 
 ## [1.1.0] - 2025-01-04
 

@@ -198,6 +198,22 @@ The system tracks installed versions and automatically handles updates:
 - ✅ WSL (Windows Subsystem for Linux)
 - ❌ Native Windows PowerShell (use WSL instead)
 
+## System Requirements
+
+### Required Tools
+- **Bash**: Version 3.2+ (macOS default) or 4.0+ (recommended)
+- **curl**: Any recent version with SSL support
+- **Git**: Version 2.0+ (for development and contributions)
+
+### Optional Tools
+- **jq**: For JSON parsing (falls back to grep/sed if not available)
+- **BATS**: Version 1.0+ (for running tests)
+
+### Version Compatibility Notes
+- The installer uses POSIX-compliant shell features for maximum compatibility
+- All scripts are tested on both macOS (BSD utilities) and Linux (GNU utilities)
+- No GNU-specific features are used to ensure cross-platform compatibility
+
 ## Troubleshooting
 
 ### Installation Issues
