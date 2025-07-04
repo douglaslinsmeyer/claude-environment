@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "components": {
+    "workflows": {
+      "description": "Claude workflow files for various tasks",
+      "files": [
+        "workflows/coding/debug-helper.md",
+        "workflows/coding/code-review.md",
+        "workflows/coding/refactor-guide.md",
+        "workflows/coding/test-writer.md",
+        "workflows/writing/blog-post.md",
+        "workflows/writing/documentation.md",
+        "workflows/writing/email-draft.md",
+        "workflows/writing/technical-article.md",
+        "workflows/analysis/data-exploration.md",
+        "workflows/analysis/research-summary.md",
+        "workflows/analysis/trend-analysis.md"
+      ]
+    },
+    "personas": {
+      "description": "Claude persona configurations", 
+      "files": [
+        "personas/senior-developer.md",
+        "personas/technical-writer.md",
+        "personas/data-analyst.md",
+        "personas/product-manager.md",
+        "personas/researcher.md"
+      ]
+    },
+    "claude-files": {
+      "description": "Main Claude configuration files",
+      "files": [
+        "claude-files/global-CLAUDE.md",
+        "claude-files/project-templates/web-dev-CLAUDE.md",
+        "claude-files/project-templates/data-science-CLAUDE.md",
+        "claude-files/project-templates/mobile-app-CLAUDE.md"
+      ]
+    },
+    "templates": {
+      "description": "Project and documentation templates",
+      "files": [
+        "templates/README-template.md",
+        "templates/CLAUDE-template.md",
+        "templates/project-setup.md"
+      ]
+    }
+  }
+}
