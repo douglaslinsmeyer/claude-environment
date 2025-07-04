@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2025-07-03
+
+### Added
+- GH_TOKEN environment variable in CI workflow for GitHub release creation
+
+### Changed
+- Consolidated release workflow into main CI pipeline
+- Release creation now happens automatically after all tests pass
+- Updated validation tests to check for release functionality in CI workflow
+
+### Fixed
+- YAML syntax error caused by heredoc (<<EOF) in GitHub Actions workflow
+- BATS compatibility issues with older versions (removed 'run !' syntax)
+- ShellCheck warnings in validation tests (SC2314)
+- Missing release.yml test updated to verify CI workflow contains release steps
+
+### Removed
+- Separate release.yml workflow (functionality moved to CI workflow)
+
 ## [1.2.0] - 2025-07-03
 
 ### Added
@@ -94,7 +113,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/douglaslinsmeyer/claude-environment/releases/tag/v1.0.0
