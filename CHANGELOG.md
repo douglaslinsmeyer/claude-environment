@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Python minimum version from 3.8 to 3.9 in project-setup.md (Python 3.8 reached EOL in October 2024)
 - Updated Node.js Docker images from version 18 to 22 (current LTS) in project-setup.md
 - Pinned ludeeus/action-shellcheck to version 2.0.0 instead of using @master
+- Improved release process - tags are automatically created after all CI tests pass on main branch
+- Release workflow triggered by tags ensures only tested code is released
 
 ### Fixed
 - Fixed bump-version.sh script compatibility with macOS awk by removing GNU-specific match() syntax

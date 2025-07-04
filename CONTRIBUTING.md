@@ -187,16 +187,29 @@ Example:
 
 ## Release Process
 
-Releases are managed by maintainers:
+Releases are automatically created after all CI tests pass on the main branch:
 
 1. Update version using the bump script:
    ```bash
    ./scripts/bump-version.sh [major|minor|patch]
    ```
-2. Review and clean up CHANGELOG.md
-3. Commit version bump
-4. Tag the release
-5. Push tag to trigger release workflow
+2. Review and update the Unreleased section in CHANGELOG.md with your changes
+3. Commit the version bump:
+   ```bash
+   git add VERSION CHANGELOG.md
+   git commit -m "chore: bump version to X.Y.Z"
+   ```
+4. Push to main:
+   ```bash
+   git push origin main
+   ```
+5. The CI/CD pipeline will automatically:
+   - Run all tests (unit, integration, linting)
+   - If all tests pass, create a git tag for the version
+   - The tag will trigger the release workflow
+   - Generate a GitHub release with changelog content
+
+This ensures that releases are only created from code that has passed all quality checks.
 
 ## Questions?
 

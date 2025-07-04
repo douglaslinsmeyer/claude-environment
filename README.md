@@ -247,6 +247,21 @@ curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/
 curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/main/install.sh | bash -s -- --force
 ```
 
+## Automated Release Process
+
+This project uses a fully automated release process to ensure quality:
+
+1. **Development**: Make changes and update VERSION file
+2. **Testing**: Push to main triggers comprehensive CI/CD pipeline
+3. **Tagging**: If all tests pass, a git tag is automatically created
+4. **Release**: The tag triggers automatic GitHub release creation
+
+This ensures that:
+- Every release has passed all tests
+- Releases are consistent and reproducible
+- No manual intervention is required
+- Version control is maintained automatically
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on how to contribute to this project.

@@ -189,3 +189,43 @@ jobs:
     steps:
       - name: All tests passed
         run: echo "All tests passed successfully! ✅"
+
+  create-tag:
+    name: Create Tag if Version Changed
+    needs: all-tests
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Check and create tag
+        run: |
+          # Get current version from VERSION file
+          current_version=$(cat VERSION)
+          echo "Current version: $current_version"
+          
+          # Check if tag already exists
+          if git rev-parse "v$current_version" >/dev/null 2>&1; then
+            echo "Tag v$current_version already exists, skipping tag creation"
+          else
+            echo "Creating tag v$current_version"
+            
+            # Configure git
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            
+            # Create annotated tag
+            git tag -a "v$current_version" -m "Release version $current_version"
+            
+            # Push tag to trigger release workflow
+            git push origin "v$current_version"
+            
+            echo "Tag v$current_version created and pushed"
+          fi
