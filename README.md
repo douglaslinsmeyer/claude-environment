@@ -253,8 +253,10 @@ This project uses a fully automated release process to ensure quality:
 
 1. **Development**: Make changes and update VERSION file
 2. **Testing**: Push to main triggers comprehensive CI/CD pipeline
-3. **Tagging**: If all tests pass, a git tag is automatically created
-4. **Release**: The tag triggers automatic GitHub release creation
+3. **Release**: If all tests pass, the CI automatically:
+   - Creates a git tag for the version
+   - Generates release notes from CHANGELOG.md
+   - Creates and publishes a GitHub release
 
 This ensures that:
 - Every release has passed all tests

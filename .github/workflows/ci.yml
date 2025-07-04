@@ -190,8 +190,8 @@ jobs:
       - name: All tests passed
         run: echo "All tests passed successfully! ✅"
 
-  create-tag:
-    name: Create Tag if Version Changed
+  create-release:
+    name: Create Release if Version Changed
     needs: all-tests
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -203,6 +203,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Note: Using GITHUB_TOKEN here means the tag push won't trigger the release workflow
+          # This is a GitHub security feature to prevent infinite workflow loops
+          # To enable automatic releases, you would need to use a Personal Access Token (PAT)
+          # For now, releases need to be created manually after tags are pushed
           token: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Check and create tag
@@ -224,8 +228,52 @@ jobs:
             # Create annotated tag
             git tag -a "v$current_version" -m "Release version $current_version"
             
-            # Push tag to trigger release workflow
+            # Push tag
             git push origin "v$current_version"
             
             echo "Tag v$current_version created and pushed"
+          fi
+          
+      - name: Create GitHub Release
+        if: success()
+        run: |
+          current_version=$(cat VERSION)
+          
+          # Only create release if tag was just created
+          if git rev-parse "v$current_version" >/dev/null 2>&1 && ! gh release view "v$current_version" >/dev/null 2>&1; then
+            echo "Creating GitHub release for v$current_version"
+            
+            # Extract changelog section for this version
+            changelog=$(awk -v ver="## [$current_version]" '
+              $0 ~ ver { found=1; next }
+              found && /^## \[/ { exit }
+              found { print }
+            ' CHANGELOG.md)
+            
+            # Create release body
+            cat > release-body.md << EOF
+## Installation
+
+\`\`\`bash
+curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/v$current_version/install.sh | bash
+\`\`\`
+
+## What's Changed
+
+$changelog
+
+---
+
+**Full Changelog**: https://github.com/douglaslinsmeyer/claude-environment/blob/main/CHANGELOG.md
+EOF
+            
+            # Create the release
+            gh release create "v$current_version" \
+              --title "Release $current_version" \
+              --notes-file release-body.md \
+              --verify-tag
+            
+            echo "Release created successfully!"
+          else
+            echo "Release already exists or tag not found, skipping release creation"
           fi

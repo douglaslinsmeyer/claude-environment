@@ -206,8 +206,8 @@ Releases are automatically created after all CI tests pass on the main branch:
 5. The CI/CD pipeline will automatically:
    - Run all tests (unit, integration, linting)
    - If all tests pass, create a git tag for the version
-   - The tag will trigger the release workflow
-   - Generate a GitHub release with changelog content
+   - Create a GitHub release with changelog content
+   - Publish the release with installation instructions
 
 This ensures that releases are only created from code that has passed all quality checks.
 
