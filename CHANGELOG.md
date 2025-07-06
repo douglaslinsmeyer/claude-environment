@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2025-07-06
+
+### Added
+- Prompt coaching feature to help engineers write better prompts
+  - Added instructions in CLAUDE.md for providing constructive prompt feedback
+  - Created comprehensive prompt-best-practices.md guide with examples
+  - Includes specific tips for C#/.NET engineers
+  - Features prompt templates for common tasks (code review, debugging, refactoring)
+
+### Changed
+- Updated Senior Developer persona to include C#/.NET expertise
+  - Added C# as primary language alongside existing languages
+  - Added ASP.NET Core, .NET 6/7/8, and Entity Framework Core
+  - Added SQL Server and .NET ecosystem tools (NuGet, Visual Studio, xUnit, Reqnroll)
+  - Added .NET-specific best practices including async/await patterns and SOLID principles
+
 ## [1.4.0] - 2025-07-06
 
 ### Added
@@ -123,7 +139,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.0.0...v1.1.0
