@@ -96,12 +96,25 @@ awk -v version="$NEW_VERSION" -v date="$DATE" -v prev_version="$PREV_VERSION" '
 mv "$TEMP_FILE" CHANGELOG.md
 echo -e "${GREEN}✓${NC} Updated CHANGELOG.md"
 
+# Update manifest.json
+if [[ -f "manifest.json" ]]; then
+    # Use sed to update the version in manifest.json
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        sed -i '' "s/\"version\": \"${CURRENT_VERSION}\"/\"version\": \"${NEW_VERSION}\"/" manifest.json
+    else
+        # Linux
+        sed -i "s/\"version\": \"${CURRENT_VERSION}\"/\"version\": \"${NEW_VERSION}\"/" manifest.json
+    fi
+    echo -e "${GREEN}✓${NC} Updated manifest.json"
+fi
+
 # Show what needs to be done
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
 echo "1. Update the Unreleased section in CHANGELOG.md with your changes"
 echo "2. Commit the version bump:"
-echo "   git add VERSION CHANGELOG.md"
+echo "   git add VERSION CHANGELOG.md manifest.json"
 echo "   git commit -m \"chore: bump version to ${NEW_VERSION}\""
 echo "3. Push to main:"
 echo "   git push origin main"

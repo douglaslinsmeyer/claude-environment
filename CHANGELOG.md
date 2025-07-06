@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2025-07-06
+
+### Added
+- CLI Developer persona based on clig.dev principles
+  - Comprehensive understanding of CLI design best practices
+  - Focus on human-first design while maintaining UNIX composability
+  - Expertise in CLI frameworks across multiple languages (Cobra, Clap, Click, Oclif)
+  - Emphasis on error handling, progress feedback, and cross-platform compatibility
+  - Includes terminal UI design and distribution strategies
+- Enhanced code review workflow with additional review categories
+  - Style & Conventions checks
+  - Dependencies review
+  - Version Control best practices
+  - 12-Factor App and SOLID principles references
+
 ## [1.5.0] - 2025-07-06
 
 ### Added
@@ -139,7 +154,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.2.0...v1.3.0

@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "components": {
     "workflows": {
       "description": "Claude workflow files for various tasks",
@@ -25,7 +25,8 @@
         "personas/data-analyst.md",
         "personas/product-manager.md",
         "personas/researcher.md",
-        "personas/senior-devops-engineer.md"
+        "personas/senior-devops-engineer.md",
+        "personas/cli-developer.md"
       ]
     },
     "claude-files": {
