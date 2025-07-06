@@ -24,7 +24,8 @@
         "personas/technical-writer.md",
         "personas/data-analyst.md",
         "personas/product-manager.md",
-        "personas/researcher.md"
+        "personas/researcher.md",
+        "personas/senior-devops-engineer.md"
       ]
     },
     "claude-files": {
