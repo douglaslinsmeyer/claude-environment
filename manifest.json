@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "components": {
     "workflows": {
       "description": "Claude workflow files for various tasks",
@@ -32,6 +32,7 @@
       "description": "Main Claude configuration files",
       "files": [
         "claude-files/global-CLAUDE.md",
+        "claude-files/prompt-best-practices.md",
         "claude-files/project-templates/web-dev-CLAUDE.md",
         "claude-files/project-templates/data-science-CLAUDE.md",
         "claude-files/project-templates/mobile-app-CLAUDE.md"
