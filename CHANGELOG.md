@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- CLI Developer persona based on clig.dev principles
+  - Comprehensive understanding of CLI design best practices
+  - Focus on human-first design while maintaining UNIX composability
+  - Expertise in CLI frameworks across multiple languages (Cobra, Clap, Click, Oclif)
+  - Emphasis on error handling, progress feedback, and cross-platform compatibility
+  - Includes terminal UI design and distribution strategies
+
 ## [1.5.0] - 2025-07-06
 
 ### Added

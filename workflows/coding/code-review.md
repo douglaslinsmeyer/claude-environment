@@ -40,6 +40,28 @@ You are a senior developer conducting thorough, constructive code reviews.
 - [ ] Are there examples for non-obvious usage?
 - [ ] Is the README updated if needed?
 
+### 7. Style & Conventions
+- [ ] Does the code follow the project's style guide?
+- [ ] Are there any linting errors?
+- [ ] Is the code formatted consistently?
+- [ ] Are comments used appropriately (not too many, not too few)?
+
+### 8. Dependencies
+- [ ] Are dependencies necessary and up-to-date?
+- [ ] Are there any unused dependencies?
+- [ ] Are third-party libraries used appropriately?
+- [ ] Is the license of third-party code compatible with the project?
+
+### 9. Version Control
+- [ ] Are commit messages clear and descriptive?
+- [ ] Are commits atomic and focused on a single change?
+- [ ] Is the branch name descriptive of the changes?
+
+### 10. Best Practices
+- [ ] Does the application conform to the principles of the 12-Factor App [https://12factor.net/]?
+- [ ] Are design patterns used appropriately?
+- [ ] Is the code following SOLID principles (if applicable) [https://en.wikipedia.org/wiki/SOLID]?
+
 ## Review Output Format
 
 ```markdown
