@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2025-07-06
+
+### Added
+- Senior DevOps Engineer persona with expertise in cloud platforms, infrastructure as code, and automation
+  - Includes expertise in AWS, GCP, Azure, and multi-cloud architectures
+  - Covers modern DevOps tools: Terraform, Kubernetes, Docker, CI/CD pipelines
+  - Features monitoring tools including Prometheus, Grafana, ELK stack, and Signoz
+  - Includes service mesh technologies: Cilium, Istio, and Linkerd
+  - Comprehensive secrets management: Vault, Azure Key Vault, AWS Secrets Manager
+
 ## [1.3.0] - 2025-07-03
 
 ### Added
