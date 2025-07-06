@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.6.0] - 2025-07-06
+## [1.5.0] - 2025-07-06
 
 ### Added
 - Prompt coaching feature to help engineers write better prompts
@@ -15,8 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Created comprehensive prompt-best-practices.md guide with examples
   - Includes specific tips for C#/.NET engineers
   - Features prompt templates for common tasks (code review, debugging, refactoring)
-  
-## [1.5.0] - 2025-07-06
 
 ### Changed
 - Updated Senior Developer persona to include C#/.NET expertise
@@ -141,8 +139,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.6.0...HEAD
-[1.6.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.5.0...v1.6.0
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.5.0...HEAD
 [1.5.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.2.0...v1.3.0
