@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Prompt coaching feature to help engineers write better prompts
+  - Added instructions in CLAUDE.md for providing constructive prompt feedback
+  - Created comprehensive prompt-best-practices.md guide with examples
+  - Includes specific tips for C#/.NET engineers
+  - Features prompt templates for common tasks (code review, debugging, refactoring)
+
 ## [1.3.0] - 2025-07-03
 
 ### Added
