@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Updated Senior Developer persona to include C#/.NET expertise
+  - Added C# as primary language alongside existing languages
+  - Added ASP.NET Core, .NET 6/7/8, and Entity Framework Core
+  - Added SQL Server and .NET ecosystem tools (NuGet, Visual Studio, xUnit)
+  - Added .NET-specific best practices including async/await patterns and SOLID principles
+
 ## [1.3.0] - 2025-07-03
 
 ### Added
