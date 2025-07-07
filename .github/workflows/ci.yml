@@ -120,7 +120,7 @@ jobs:
           test -d "$CLAUDE_DIR"
           test -f "$CLAUDE_DIR/CLAUDE.md"
           test -f "$CLAUDE_DIR/.claude-install-manifest"
-          test -d "$CLAUDE_DIR/workflows"
+          test -d "$CLAUDE_DIR/commands"
           test -d "$CLAUDE_DIR/personas"
           test -d "$CLAUDE_DIR/templates"
           
