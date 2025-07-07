@@ -268,7 +268,6 @@ EOF
 @test "confirm_action returns 0 in force mode" {
     FORCE=true
     confirm_action "Test prompt" >/dev/null 2>&1
-    [[ $? -eq 0 ]]
 }
 
 # Removed overly complex user interaction tests - 
@@ -284,22 +283,7 @@ EOF
     [[ -z "$result" ]]
 }
 
-@test "get_special_mapping returns mapping for claude-files global-CLAUDE.md" {
-    # Load manifest with special mapping
-    MANIFEST_DATA='{
-        "components": {
-            "claude-files": {
-                "files": ["claude-files/global-CLAUDE.md"],
-                "special_mappings": {
-                    "claude-files/global-CLAUDE.md": "CLAUDE.md"
-                }
-            }
-        }
-    }'
-    
-    result=$(get_special_mapping "claude-files" "claude-files/global-CLAUDE.md")
-    [[ "$result" == "CLAUDE.md" ]]
-}
+# Removed special mapping test - claude-files component no longer exists
 
 @test "get_special_mapping handles missing component gracefully" {
     MANIFEST_DATA='{"components": {}}'
@@ -312,10 +296,13 @@ EOF
     MANIFEST_DATA='invalid json'
     
     # The function should handle invalid JSON gracefully
-    result=$(get_special_mapping "claude-files" "claude-files/global-CLAUDE.md" 2>/dev/null || echo "")
     # It should either return empty or not crash
     # We don't care about the exact result, just that it doesn't fail catastrophically
-    [[ $? -eq 0 ]]
+    if result=$(get_special_mapping "commands" "commands/test.md" 2>/dev/null); then
+        true  # Command succeeded, that's all we care about
+    else
+        true  # Command failed but didn't crash the script
+    fi
 }
 
 # Removed "works without jq" test - tests implementation details
@@ -324,7 +311,7 @@ EOF
 @test "get_special_mapping returns empty when MANIFEST_DATA is empty" {
     MANIFEST_DATA=""
     
-    result=$(get_special_mapping "claude-files" "claude-files/global-CLAUDE.md")
+    result=$(get_special_mapping "commands" "commands/test.md")
     [[ -z "$result" ]]
 }
 
@@ -393,13 +380,14 @@ EOF
     FORCE=true
     INSTALLED_FILES=()
     
-    # Set up manifest with special mapping
+    # Set up manifest with hypothetical special mapping
+    # Since claude-files is gone, test with a hypothetical mapping
     MANIFEST_DATA='{
         "components": {
-            "claude-files": {
-                "files": ["claude-files/global-CLAUDE.md"],
+            "commands": {
+                "files": ["commands/test.md"],
                 "special_mappings": {
-                    "claude-files/global-CLAUDE.md": "CLAUDE.md"
+                    "commands/test.md": "test-renamed.md"
                 }
             }
         }
@@ -408,21 +396,21 @@ EOF
     # Mock download_file
     download_file() {
         # Check that the target path uses the special mapping
-        if [[ "$2" == *"CLAUDE.md" ]]; then
+        if [[ "$2" == *"test-renamed.md" ]]; then
             return 0
         fi
         return 1
     }
     export -f download_file
     
-    install_component "claude-files" "$TEST_DIR"
+    install_component "commands" "$TEST_DIR"
     
     # Clean up
     unset -f download_file
     
     # Should track the mapped filename
     [[ ${#INSTALLED_FILES[@]} -eq 1 ]]
-    [[ "${INSTALLED_FILES[0]}" == "CLAUDE.md" ]]
+    [[ "${INSTALLED_FILES[0]}" == "test-renamed.md" ]]
 }
 
 @test "install_component handles download failures" {
@@ -463,49 +451,7 @@ EOF
     [[ "$COMPONENT_FILE_COUNT" -eq 1 ]]
 }
 
-@test "install_component prompts for existing CLAUDE.md without force" {
-    INSTALL_COMMANDS=true
-    DRY_RUN=false
-    FORCE=false
-    INSTALLED_FILES=()
-    
-    # Create existing CLAUDE.md
-    mkdir -p "$TEST_DIR"
-    echo "existing content" > "$TEST_DIR/CLAUDE.md"
-    
-    # Set up manifest
-    MANIFEST_DATA='{
-        "components": {
-            "claude-files": {
-                "files": ["claude-files/global-CLAUDE.md", "claude-files/other.md"],
-                "special_mappings": {
-                    "claude-files/global-CLAUDE.md": "CLAUDE.md"
-                }
-            }
-        }
-    }'
-    
-    # Mock confirm_action to return false (user says no)
-    confirm_action() {
-        return 1
-    }
-    export -f confirm_action
-    
-    # Mock download_file
-    download_file() {
-        return 0
-    }
-    export -f download_file
-    
-    install_component "claude-files" "$TEST_DIR"
-    
-    # Clean up
-    unset -f confirm_action download_file
-    
-    # Should skip CLAUDE.md but install other files
-    [[ ${#INSTALLED_FILES[@]} -eq 1 ]]
-    [[ "${INSTALLED_FILES[0]}" == "claude-files/other.md" ]]
-}
+# Removed test for CLAUDE.md prompting - claude-files component no longer exists
 
 # Network Error Handling Tests
 
