@@ -6,6 +6,9 @@
 setup() {
     export PROJECT_ROOT
     PROJECT_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
+
+    # Load test helpers
+    source "$PROJECT_ROOT/tests/test-helpers.sh"
 }
 
 # Markdown file validation
@@ -38,17 +41,49 @@ setup() {
     fi
 }
 
-@test "manifest.json has required fields" {
-    if command -v jq >/dev/null 2>&1; then
-        version=$(jq -r '.version' "$PROJECT_ROOT/manifest.json")
-        [[ "$version" != "null" ]]
+@test "manifest.json conforms to schema" {
+    # Check if ajv-cli is available for JSON schema validation
+    if command -v ajv >/dev/null 2>&1; then
+        ajv validate -s "$PROJECT_ROOT/tests/manifest-schema.json" -d "$PROJECT_ROOT/manifest.json"
+    elif command -v python3 >/dev/null 2>&1; then
+        # Fallback to Python jsonschema if available
+        if python3 -c "import jsonschema" 2>/dev/null; then
+            python3 -c "
+import json, sys
+import jsonschema
+with open('$PROJECT_ROOT/tests/manifest-schema.json') as f:
+    schema = json.load(f)
+with open('$PROJECT_ROOT/manifest.json') as f:
+    data = json.load(f)
+try:
+    jsonschema.validate(data, schema)
+except jsonschema.ValidationError as e:
+    print(f'Schema validation error: {e.message}')
+    sys.exit(1)
+"
+        else
+            skip "Python jsonschema module not available"
+        fi
+    else
+        skip "No JSON schema validator available"
+    fi
+}
 
-        # Check components exist
-        components=$(jq -r '.components | keys[]' "$PROJECT_ROOT/manifest.json" 2>/dev/null)
-        [[ "$components" == *"commands"* ]]
-        [[ "$components" == *"personas"* ]]
-        [[ "$components" == *"claude-files"* ]]
-        [[ "$components" == *"templates"* ]]
+@test "manifest.json has required fields" {
+    if has_jq; then
+        # Check required fields
+        check_manifest_required_fields "$PROJECT_ROOT/manifest.json"
+
+        # Dynamically check that manifest has at least one component
+        components=$(get_manifest_components "$PROJECT_ROOT/manifest.json")
+        [[ -n "$components" ]]
+
+        # Verify each component has proper structure
+        while IFS= read -r component; do
+            [[ -z "$component" ]] && continue
+            verify_component_structure "$PROJECT_ROOT/manifest.json" "$component" || \
+                fail "Component '$component' missing required fields"
+        done <<< "$components"
     else
         skip "jq not available"
     fi
@@ -141,9 +176,9 @@ setup() {
 # Check for file references in manifest
 
 @test "all files in manifest exist" {
-    if command -v jq >/dev/null 2>&1; then
-        # Get all file references from manifest
-        files=$(jq -r '.components[].files[]' "$PROJECT_ROOT/manifest.json" 2>/dev/null | sort | uniq)
+    if has_jq; then
+        # Get all file references from manifest using helper
+        files=$(get_all_manifest_files "$PROJECT_ROOT/manifest.json")
 
         while IFS= read -r file; do
             [[ -z "$file" ]] && continue

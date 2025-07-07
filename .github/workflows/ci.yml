@@ -119,13 +119,18 @@ jobs:
             CLAUDE_DIR=".claude"
           fi
           
+          # Load test helpers
+          source tests/test-helpers.sh
+          
           # Check key files exist
           test -d "$CLAUDE_DIR"
-          test -f "$CLAUDE_DIR/CLAUDE.md"
           test -f "$CLAUDE_DIR/.claude-install-manifest"
-          test -d "$CLAUDE_DIR/commands"
-          test -d "$CLAUDE_DIR/personas"
-          test -d "$CLAUDE_DIR/templates"
+          
+          # Dynamically verify component directories from manifest
+          while IFS= read -r component; do
+            [[ -z "$component" ]] && continue
+            test -d "$CLAUDE_DIR/$component" || (echo "Missing component directory: $component" && exit 1)
+          done < <(get_manifest_components manifest.json)
           
           echo "Installation test passed!"
 
@@ -145,20 +150,30 @@ jobs:
           # Use local files for installation test
           export CLAUDE_ENV_REPO_URL="file://$GITHUB_WORKSPACE"
           
+          # Load test helpers
+          source tests/test-helpers.sh
+          
           # First installation
           bash install.sh --force
           
-          # Verify first installation
-          test -f "$HOME/.claude/CLAUDE.md"
+          # Dynamically select a test file from manifest
+          TEST_FILE=$(get_test_file manifest.json)
           
-          # Modify a file
-          echo "Modified" > "$HOME/.claude/CLAUDE.md"
+          # Verify first installation
+          test -f "$HOME/.claude/$TEST_FILE"
+          
+          # Save original content
+          ORIGINAL_CONTENT=$(cat "$HOME/.claude/$TEST_FILE")
+          
+          # Modify the file
+          echo "Modified content for testing" > "$HOME/.claude/$TEST_FILE"
           
           # Run update
           bash install.sh --force
           
           # Verify file was restored
-          ! grep -q "Modified" "$HOME/.claude/CLAUDE.md"
+          RESTORED_CONTENT=$(cat "$HOME/.claude/$TEST_FILE")
+          [[ "$ORIGINAL_CONTENT" == "$RESTORED_CONTENT" ]] || (echo "File not properly restored during update" && exit 1)
           
           echo "Update test passed!"
 

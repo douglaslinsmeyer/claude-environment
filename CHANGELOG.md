@@ -14,6 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated manifest.json to remove deleted template files
   - Removed claude-files component from install.sh script
   - Removed obsolete test for claude-files in install.bats
+- Fixed CI workflow failures
+  - Removed hard-coded claude-files check from validation tests
+  - Updated CI installation tests to remove CLAUDE.md verification
+  - Changed update test to use README-template.md instead of removed CLAUDE.md
+
+### Added
+- CI brittleness analysis documentation with recommendations for improving test resilience
+- Test helper script for dynamic manifest validation (tests/test-helpers.sh)
+- JSON schema for manifest.json validation (tests/manifest-schema.json)
+- Version consistency tests to ensure synchronization across files
+- Dynamic component validation in tests - tests now adapt to manifest.json structure
+- Improved CI test resilience with dynamic file verification
 
 ## [2.2.0] - 2025-07-07
 
