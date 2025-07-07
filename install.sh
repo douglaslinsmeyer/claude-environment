@@ -1,15 +1,16 @@
 #!/bin/bash
 
 # Claude Configuration Installer
-# Installs Claude workflows, personas, and configuration files
+# Installs Claude commands, personas, and configuration files
 # Works on macOS and Linux (including WSL)
 
 set -e  # Exit on any error
 
 # Default values
-REPO_URL="https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/main"
+# Allow REPO_URL to be overridden by environment variable (useful for CI/testing)
+REPO_URL="${CLAUDE_ENV_REPO_URL:-https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/main}"
 INSTALL_TYPE="global"
-INSTALL_WORKFLOWS=true
+INSTALL_COMMANDS=true
 INSTALL_PERSONAS=true
 INSTALL_TEMPLATES=true
 FORCE=false
@@ -40,7 +41,7 @@ USAGE:
 OPTIONS:
     --global          Install to ~/.claude (default)
     --local           Install to current directory
-    --no-workflows    Skip workflow files
+    --no-commands     Skip command files
     --no-personas     Skip persona files
     --no-templates    Skip template files
     --force           Skip confirmation prompts
@@ -72,8 +73,8 @@ parse_args() {
                 INSTALL_TYPE="local"
                 shift
                 ;;
-            --no-workflows)
-                INSTALL_WORKFLOWS=false
+            --no-commands)
+                INSTALL_COMMANDS=false
                 shift
                 ;;
             --no-personas)
@@ -126,6 +127,16 @@ get_remote_version() {
 # Download and parse the remote manifest
 get_remote_manifest() {
     curl -sSfL "${REPO_URL}/manifest.json" 2>/dev/null || echo "{}"
+}
+
+# Cache manifest data globally
+MANIFEST_DATA=""
+
+# Load manifest data
+load_manifest_data() {
+    if [[ -z "$MANIFEST_DATA" ]]; then
+        MANIFEST_DATA=$(get_remote_manifest)
+    fi
 }
 
 # Show version information
@@ -238,55 +249,78 @@ remove_old_files() {
     fi
 }
 
-# Get list of files for a component
+# Get list of files for a component from manifest
 get_component_files() {
     local component="$1"
-    local files=()
 
-    case "$component" in
-        "workflows")
-            files=(
-                "workflows/coding/debug-helper.md"
-                "workflows/coding/code-review.md"
-                "workflows/coding/refactor-guide.md"
-                "workflows/coding/test-writer.md"
-                "workflows/writing/blog-post.md"
-                "workflows/writing/documentation.md"
-                "workflows/writing/email-draft.md"
-                "workflows/writing/technical-article.md"
-                "workflows/analysis/data-exploration.md"
-                "workflows/analysis/research-summary.md"
-                "workflows/analysis/trend-analysis.md"
-            )
-            ;;
-        "personas")
-            files=(
-                "personas/senior-developer.md"
-                "personas/technical-writer.md"
-                "personas/data-analyst.md"
-                "personas/product-manager.md"
-                "personas/researcher.md"
-            )
-            ;;
-        "claude-files")
-            files=(
-                "claude-files/global-CLAUDE.md"
-                "claude-files/project-templates/web-dev-CLAUDE.md"
-                "claude-files/project-templates/data-science-CLAUDE.md"
-                "claude-files/project-templates/mobile-app-CLAUDE.md"
-            )
-            ;;
-        "templates")
-            files=(
-                "templates/README-template.md"
-                "templates/CLAUDE-template.md"
-                "templates/project-setup.md"
-            )
-            ;;
-    esac
+    # Manifest is required - no fallback
+    if [[ -z "$MANIFEST_DATA" ]]; then
+        print_error "Unable to load manifest data"
+        return 1
+    fi
 
-    if [[ ${#files[@]} -gt 0 ]]; then
-        printf '%s\n' "${files[@]}"
+    if command -v jq >/dev/null 2>&1; then
+        # Use jq to parse the manifest
+        echo "$MANIFEST_DATA" | jq -r ".components.\"$component\".files[]?" 2>/dev/null
+    else
+        # Basic parsing without jq
+        # Extract the component section and parse files
+        local in_component=false
+        local in_files=false
+        local brace_count=0
+
+        while IFS= read -r line; do
+            # Look for the component section
+            if [[ "$line" =~ \"$component\" ]]; then
+                in_component=true
+            fi
+
+            if [[ "$in_component" == true ]]; then
+                # Track braces to know when we're in the files array
+                if [[ "$line" =~ \"files\"[[:space:]]*: ]]; then
+                    in_files=true
+                fi
+
+                if [[ "$in_files" == true ]]; then
+                    # Extract file paths from quotes
+                    if [[ "$line" =~ \"([^\"]+\.md)\" ]]; then
+                        echo "${BASH_REMATCH[1]}"
+                    fi
+
+                    # Check if we've reached the end of this component
+                    if [[ "$line" =~ \}[[:space:]]*$ ]]; then
+                        ((brace_count++))
+                        if [[ $brace_count -ge 2 ]]; then
+                            break
+                        fi
+                    fi
+                fi
+            fi
+        done <<< "$MANIFEST_DATA"
+    fi
+}
+
+# Get special mappings for a component from manifest
+get_special_mapping() {
+    local component="$1"
+    local file="$2"
+
+    if [[ -z "$MANIFEST_DATA" ]]; then
+        return 0
+    fi
+
+    if command -v jq >/dev/null 2>&1; then
+        # Use jq to get the special mapping
+        echo "$MANIFEST_DATA" | jq -r ".components.\"$component\".special_mappings.\"$file\"? // empty" 2>/dev/null
+    else
+        # Basic parsing for special mappings
+        # For now, handle the known case directly
+        if [[ "$component" == "claude-files" && "$file" == "claude-files/global-CLAUDE.md" ]]; then
+            # Check if special_mappings exists in manifest
+            if [[ "$MANIFEST_DATA" =~ \"special_mappings\" ]]; then
+                echo "CLAUDE.md"
+            fi
+        fi
     fi
 }
 
@@ -299,8 +333,8 @@ install_component() {
 
     # Check if component should be skipped
     case "$component" in
-        "workflows")
-            [[ "$INSTALL_WORKFLOWS" == "false" ]] && return 0
+        "commands")
+            [[ "$INSTALL_COMMANDS" == "false" ]] && return 0
             ;;
         "personas")
             [[ "$INSTALL_PERSONAS" == "false" ]] && return 0
@@ -333,16 +367,18 @@ install_component() {
 
         local target_path="$install_dir/$file"
 
-        # Special case: rename global-CLAUDE.md to CLAUDE.md
-        if [[ "$file" == "claude-files/global-CLAUDE.md" ]]; then
-            target_path="$install_dir/CLAUDE.md"
+        # Check for special mapping
+        local special_target
+        special_target=$(get_special_mapping "$component" "$file")
+        if [[ -n "$special_target" ]]; then
+            target_path="$install_dir/$special_target"
         fi
 
         if download_file "$file" "$target_path"; then
             ((file_count += 1))
             # Track the installed file
-            if [[ "$file" == "claude-files/global-CLAUDE.md" ]]; then
-                INSTALLED_FILES+=("CLAUDE.md")
+            if [[ -n "$special_target" ]]; then
+                INSTALLED_FILES+=("$special_target")
             else
                 INSTALLED_FILES+=("$file")
             fi
@@ -381,7 +417,7 @@ create_manifest() {
     timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     local components=()
 
-    [[ "$INSTALL_WORKFLOWS" == "true" ]] && components+=("workflows")
+    [[ "$INSTALL_COMMANDS" == "true" ]] && components+=("commands")
     [[ "$INSTALL_PERSONAS" == "true" ]] && components+=("personas")
     components+=("claude-files")
     [[ "$INSTALL_TEMPLATES" == "true" ]] && components+=("templates")
@@ -401,6 +437,9 @@ EOF
 # Main installation function
 main() {
     parse_args "$@"
+
+    # Load manifest data early
+    load_manifest_data
 
     local install_dir
     install_dir=$(get_install_dir)
@@ -438,7 +477,7 @@ main() {
 
     # Install components
     local total_files=0
-    for component in "workflows" "personas" "claude-files" "templates"; do
+    for component in "commands" "personas" "claude-files" "templates"; do
         local count
         count=$(install_component "$component" "$install_dir")
         ((total_files += count))

@@ -1,20 +1,20 @@
 {
-  "version": "1.6.0",
+  "version": "2.1.0",
   "components": {
-    "workflows": {
-      "description": "Claude workflow files for various tasks",
+    "commands": {
+      "description": "Claude command files for various tasks",
       "files": [
-        "workflows/coding/debug-helper.md",
-        "workflows/coding/code-review.md",
-        "workflows/coding/refactor-guide.md",
-        "workflows/coding/test-writer.md",
-        "workflows/writing/blog-post.md",
-        "workflows/writing/documentation.md",
-        "workflows/writing/email-draft.md",
-        "workflows/writing/technical-article.md",
-        "workflows/analysis/data-exploration.md",
-        "workflows/analysis/research-summary.md",
-        "workflows/analysis/trend-analysis.md"
+        "commands/coding/code-review.md",
+        "commands/coding/debug.md",
+        "commands/coding/refactor.md",
+        "commands/coding/write-tests.md",
+        "commands/writing/blog-post.md",
+        "commands/writing/documentation.md",
+        "commands/writing/email-draft.md",
+        "commands/writing/technical-article.md",
+        "commands/analysis/explore-data.md",
+        "commands/analysis/research-summary.md",
+        "commands/analysis/trend-analysis.md"
       ]
     },
     "personas": {
@@ -37,7 +37,10 @@
         "claude-files/project-templates/web-dev-CLAUDE.md",
         "claude-files/project-templates/data-science-CLAUDE.md",
         "claude-files/project-templates/mobile-app-CLAUDE.md"
-      ]
+      ],
+      "special_mappings": {
+        "claude-files/global-CLAUDE.md": "CLAUDE.md"
+      }
     },
     "templates": {
       "description": "Project and documentation templates",

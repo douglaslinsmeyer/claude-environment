@@ -60,7 +60,7 @@ The test suite now includes:
 
 Follow conventional commit format:
 ```bash
-git commit -m "feat: add new workflow for X"
+git commit -m "feat: add new command for X"
 git commit -m "fix: correct parsing issue in Y"
 git commit -m "docs: update README with Z"
 ```
@@ -144,11 +144,11 @@ Include:
 
 ## Adding New Components
 
-### New Workflows
-1. Add the workflow file to appropriate subdirectory in `workflows/`
+### New Commands
+1. Add the command file to appropriate subdirectory in `commands/`
 2. Update `manifest.json` with the new file
 3. Update the file list in `install.sh`
-4. Add tests for the new workflow
+4. Add tests for the new command
 5. Document in README if significant
 
 ### New Personas
@@ -179,7 +179,7 @@ When making changes, update `CHANGELOG.md`:
 Example:
 ```markdown
 ### Added
-- New Python debugging workflow for data science projects (#42)
+- New Python debugging command for data science projects (#42)
 
 ### Fixed
 - Fixed installation error on macOS when path contains spaces

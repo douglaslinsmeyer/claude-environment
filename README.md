@@ -1,6 +1,6 @@
 # Claude Configuration Repository
 
-A centralized repository for Claude workflows, personas, and configuration files that can be easily shared across multiple computers and projects.
+A centralized repository for Claude commands, personas, and configuration files that can be easily shared across multiple computers and projects.
 
 ## Quick Install
 
@@ -20,10 +20,10 @@ The installer creates a `.claude` directory with the following structure:
 
 ```
 ~/.claude/                 # Global installation
-├── workflows/             # Task-specific Claude workflows
-│   ├── coding/           # Development workflows
-│   ├── writing/          # Writing and documentation workflows
-│   └── analysis/         # Data analysis and research workflows
+├── commands/             # Task-specific Claude commands
+│   ├── coding/           # Development commands
+│   ├── writing/          # Writing and documentation commands
+│   └── analysis/         # Data analysis and research commands
 ├── personas/             # Role-based Claude configurations
 ├── templates/            # Project templates and boilerplates
 ├── CLAUDE.md            # Main Claude configuration file
@@ -37,7 +37,7 @@ The installer creates a `.claude` directory with the following structure:
 - `--local` - Install to current directory `./.claude`
 
 ### Component Options
-- `--no-workflows` - Skip workflow files
+- `--no-commands` - Skip command files
 - `--no-personas` - Skip persona files
 - `--no-templates` - Skip template files
 
@@ -72,7 +72,7 @@ curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/
 ## Using Your Claude Configuration
 
 ### Global Installation
-After global installation, your workflows and configurations are available system-wide:
+After global installation, your commands and configurations are available system-wide:
 
 ```bash
 # Reference in any project
@@ -89,6 +89,158 @@ curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/
 # Creates ./my-project/.claude with all your configurations
 ```
 
+## Using Slash Commands
+
+The installed commands can be used as slash commands in Claude Code. Commands use the format `/<prefix>:<command-name> [arguments]` where prefix is either `project:` for project-specific commands or `user:` for personal commands. Since these are installed as personal commands, they use the `user:` prefix.
+
+### Coding Commands
+
+#### `/user:code-review` - Review code for quality and best practices
+```bash
+# Review a specific file
+/user:code-review src/main.py
+
+# Review recent changes
+/user:code-review analyze the recent changes in UserService
+
+# Review code you paste or describe
+/user:code-review check this function for security issues: [paste code]
+```
+
+#### `/user:debug` - Debug issues systematically
+```bash
+# Debug an error message
+/user:debug TypeError: Cannot read property 'length' of undefined
+
+# Debug with context
+/user:debug my API returns 500 when I try to update a user
+
+# Debug test failures
+/user:debug test failing with timeout in user authentication spec
+```
+
+#### `/user:refactor` - Improve code structure and quality
+```bash
+# Refactor a specific component
+/user:refactor improve the UserProfile.jsx component
+
+# Refactor for a specific goal
+/user:refactor optimize database queries in UserService
+
+# Refactor code snippet
+/user:refactor simplify this nested if-else chain: [paste code]
+```
+
+#### `/user:write-tests` - Generate comprehensive test suites
+```bash
+# Write tests for a function
+/user:write-tests create tests for calculateDiscount function
+
+# Write integration tests
+/user:write-tests integration tests for user registration flow
+
+# Write tests for pasted code
+/user:write-tests unit tests for: [paste code]
+```
+
+### Writing Commands
+
+#### `/user:documentation` - Create technical documentation
+```bash
+# Document an API
+/user:documentation create API docs for user authentication endpoints
+
+# Create a README
+/user:documentation write README for my CLI tool that processes CSV files
+
+# Document a feature
+/user:documentation document real-time collaboration feature in our app
+```
+
+#### `/user:blog-post` - Write technical blog posts
+```bash
+# Write about a technology
+/user:blog-post write about getting started with WebAssembly
+
+# Write a tutorial
+/user:blog-post tutorial on building a REST API with Node.js
+
+# Write about your experience
+/user:blog-post our journey migrating from monolith to microservices
+```
+
+#### `/user:email-draft` - Draft professional emails
+```bash
+# Project update email
+/user:email-draft weekly status update for the mobile app project
+
+# Meeting request
+/user:email-draft meeting request to discuss API design with backend team
+
+# Technical proposal
+/user:email-draft proposal for adopting TypeScript in our frontend codebase
+```
+
+#### `/user:technical-article` - Write in-depth technical articles
+```bash
+# Architecture article
+/user:technical-article explain event-driven microservices architecture
+
+# Comparison article
+/user:technical-article compare PostgreSQL vs MongoDB for our use case
+
+# Best practices article
+/user:technical-article best practices for securing REST APIs
+```
+
+### Analysis Commands
+
+#### `/user:explore-data` - Perform exploratory data analysis
+```bash
+# Analyze a dataset
+/user:explore-data analyze user_engagement_metrics.csv
+
+# Analyze specific aspects
+/user:explore-data find correlation between user age and purchase frequency
+
+# Data quality check
+/user:explore-data check customer database for inconsistencies
+```
+
+#### `/user:research-summary` - Research and summarize topics
+```bash
+# Technology research
+/user:research-summary GraphQL adoption in enterprise applications
+
+# Market research
+/user:research-summary compare cloud storage solutions for our needs
+
+# Best practices research
+/user:research-summary microservices testing strategies and tools
+```
+
+#### `/user:trend-analysis` - Analyze trends and patterns
+```bash
+# Analyze metrics
+/user:trend-analysis monthly active users over the last year
+
+# Analyze performance
+/user:trend-analysis API response times by endpoint over past quarter
+
+# Market trends
+/user:trend-analysis JavaScript framework popularity and trends in 2024
+```
+
+### Tips for Using Commands
+
+1. **Personal commands**: These commands are installed in your personal Claude configuration and use the `/user:` prefix
+2. **Be specific**: The more context you provide in arguments, the better the output
+3. **Natural language arguments**: Write arguments as you would describe the task naturally
+4. **Combine with context**: You can paste code, logs, or data directly in your command arguments
+5. **Chain commands**: Use multiple commands in sequence, like `/user:debug` followed by `/user:refactor`
+6. **Customize output**: Add specific requirements to your command arguments
+7. **Project-specific commands**: You can also create custom commands in any project's `.claude/commands/` directory using the `/project:` prefix
+
 ## Repository Structure
 
 ```
@@ -97,21 +249,25 @@ claude-config/
 ├── install.sh            # Installation script
 ├── VERSION               # Current version
 ├── manifest.json         # Installation manifest
-├── workflows/            # Claude workflow files
+├── commands/            # Claude command files
 │   ├── coding/
-│   │   ├── debug-helper.md
 │   │   ├── code-review.md
-│   │   └── refactor-guide.md
+│   │   ├── debug.md
+│   │   ├── refactor.md
+│   │   └── write-tests.md
 │   ├── writing/
 │   │   ├── blog-post.md
 │   │   ├── documentation.md
-│   │   └── email-draft.md
+│   │   ├── email-draft.md
+│   │   └── technical-article.md
 │   └── analysis/
-│       ├── data-exploration.md
+│       ├── explore-data.md
 │       ├── research-summary.md
 │       └── trend-analysis.md
 ├── personas/             # Claude persona configurations
 │   ├── senior-developer.md
+│   ├── senior-devops-engineer.md
+│   ├── cli-developer.md
 │   ├── technical-writer.md
 │   ├── data-analyst.md
 │   ├── product-manager.md
@@ -131,7 +287,7 @@ claude-config/
 
 ### Adding Your Own Files
 1. Fork this repository
-2. Add your workflows to the appropriate directories
+2. Add your commands to the appropriate directories
 3. Update the `manifest.json` if needed
 4. Commit and push your changes
 5. Update your install URL to point to your fork
