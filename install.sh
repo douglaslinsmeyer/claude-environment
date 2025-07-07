@@ -128,6 +128,16 @@ get_remote_manifest() {
     curl -sSfL "${REPO_URL}/manifest.json" 2>/dev/null || echo "{}"
 }
 
+# Cache manifest data globally
+MANIFEST_DATA=""
+
+# Load manifest data
+load_manifest_data() {
+    if [[ -z "$MANIFEST_DATA" ]]; then
+        MANIFEST_DATA=$(get_remote_manifest)
+    fi
+}
+
 # Show version information
 show_version() {
     local remote_version
@@ -238,57 +248,78 @@ remove_old_files() {
     fi
 }
 
-# Get list of files for a component
+# Get list of files for a component from manifest
 get_component_files() {
     local component="$1"
-    local files=()
 
-    case "$component" in
-        "commands")
-            files=(
-                "commands/coding/code-review.md"
-                "commands/coding/debug.md"
-                "commands/coding/refactor.md"
-                "commands/coding/write-tests.md"
-                "commands/writing/blog-post.md"
-                "commands/writing/documentation.md"
-                "commands/writing/email-draft.md"
-                "commands/writing/technical-article.md"
-                "commands/analysis/explore-data.md"
-                "commands/analysis/research-summary.md"
-                "commands/analysis/trend-analysis.md"
-            )
-            ;;
-        "personas")
-            files=(
-                "personas/senior-developer.md"
-                "personas/technical-writer.md"
-                "personas/data-analyst.md"
-                "personas/product-manager.md"
-                "personas/researcher.md"
-                "personas/senior-devops-engineer.md"
-                "personas/cli-developer.md"
-            )
-            ;;
-        "claude-files")
-            files=(
-                "claude-files/global-CLAUDE.md"
-                "claude-files/project-templates/web-dev-CLAUDE.md"
-                "claude-files/project-templates/data-science-CLAUDE.md"
-                "claude-files/project-templates/mobile-app-CLAUDE.md"
-            )
-            ;;
-        "templates")
-            files=(
-                "templates/README-template.md"
-                "templates/CLAUDE-template.md"
-                "templates/project-setup.md"
-            )
-            ;;
-    esac
+    # Manifest is required - no fallback
+    if [[ -z "$MANIFEST_DATA" ]]; then
+        print_error "Unable to load manifest data"
+        return 1
+    fi
 
-    if [[ ${#files[@]} -gt 0 ]]; then
-        printf '%s\n' "${files[@]}"
+    if command -v jq >/dev/null 2>&1; then
+        # Use jq to parse the manifest
+        echo "$MANIFEST_DATA" | jq -r ".components.\"$component\".files[]?" 2>/dev/null
+    else
+        # Basic parsing without jq
+        # Extract the component section and parse files
+        local in_component=false
+        local in_files=false
+        local brace_count=0
+
+        while IFS= read -r line; do
+            # Look for the component section
+            if [[ "$line" =~ \"$component\" ]]; then
+                in_component=true
+            fi
+
+            if [[ "$in_component" == true ]]; then
+                # Track braces to know when we're in the files array
+                if [[ "$line" =~ \"files\"[[:space:]]*: ]]; then
+                    in_files=true
+                fi
+
+                if [[ "$in_files" == true ]]; then
+                    # Extract file paths from quotes
+                    if [[ "$line" =~ \"([^\"]+\.md)\" ]]; then
+                        echo "${BASH_REMATCH[1]}"
+                    fi
+
+                    # Check if we've reached the end of this component
+                    if [[ "$line" =~ \}[[:space:]]*$ ]]; then
+                        ((brace_count++))
+                        if [[ $brace_count -ge 2 ]]; then
+                            break
+                        fi
+                    fi
+                fi
+            fi
+        done <<< "$MANIFEST_DATA"
+    fi
+}
+
+# Get special mappings for a component from manifest
+get_special_mapping() {
+    local component="$1"
+    local file="$2"
+
+    if [[ -z "$MANIFEST_DATA" ]]; then
+        return 0
+    fi
+
+    if command -v jq >/dev/null 2>&1; then
+        # Use jq to get the special mapping
+        echo "$MANIFEST_DATA" | jq -r ".components.\"$component\".special_mappings.\"$file\"? // empty" 2>/dev/null
+    else
+        # Basic parsing for special mappings
+        # For now, handle the known case directly
+        if [[ "$component" == "claude-files" && "$file" == "claude-files/global-CLAUDE.md" ]]; then
+            # Check if special_mappings exists in manifest
+            if [[ "$MANIFEST_DATA" =~ \"special_mappings\" ]]; then
+                echo "CLAUDE.md"
+            fi
+        fi
     fi
 }
 
@@ -335,16 +366,18 @@ install_component() {
 
         local target_path="$install_dir/$file"
 
-        # Special case: rename global-CLAUDE.md to CLAUDE.md
-        if [[ "$file" == "claude-files/global-CLAUDE.md" ]]; then
-            target_path="$install_dir/CLAUDE.md"
+        # Check for special mapping
+        local special_target
+        special_target=$(get_special_mapping "$component" "$file")
+        if [[ -n "$special_target" ]]; then
+            target_path="$install_dir/$special_target"
         fi
 
         if download_file "$file" "$target_path"; then
             ((file_count += 1))
             # Track the installed file
-            if [[ "$file" == "claude-files/global-CLAUDE.md" ]]; then
-                INSTALLED_FILES+=("CLAUDE.md")
+            if [[ -n "$special_target" ]]; then
+                INSTALLED_FILES+=("$special_target")
             else
                 INSTALLED_FILES+=("$file")
             fi
@@ -403,6 +436,9 @@ EOF
 # Main installation function
 main() {
     parse_args "$@"
+
+    # Load manifest data early
+    load_manifest_data
 
     local install_dir
     install_dir=$(get_install_dir)

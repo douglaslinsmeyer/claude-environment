@@ -19,6 +19,9 @@ setup() {
     export CLAUDE_ENV_TESTING=true
     source "$ORIGINAL_DIR/install.sh"
 
+    # Load manifest data for tests that need it
+    MANIFEST_DATA=$(cat "$ORIGINAL_DIR/manifest.json")
+
     # Mock the REPO_URL to use local files
     export REPO_URL="file://$ORIGINAL_DIR"
 }

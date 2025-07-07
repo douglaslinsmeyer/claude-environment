@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2025-07-06
+
+### Added
+- Special mappings support in manifest.json for file installation paths
+  - Added `special_mappings` section to claude-files component
+  - Allows mapping source files to different target paths (e.g., `global-CLAUDE.md` → `CLAUDE.md`)
+
+### Changed
+- Refactored install.sh to use manifest.json as single source of truth for file lists
+  - Removed hard-coded file lists from installer
+  - Installer now reads all file paths directly from manifest.json
+  - **BREAKING**: Installer now requires manifest.json to be available (no fallback)
+- Fixed CI workflow to check for "commands" directory instead of old "workflows" directory
+
+### Fixed
+- Trailing whitespace in install.sh and tests/install.bats
+- Test failures due to missing manifest data in test setup
+
 ## [2.0.0] - 2025-07-06
 
 ### Added
@@ -177,7 +195,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.6.0...v2.0.0
 [1.6.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.4.0...v1.5.0
