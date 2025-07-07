@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2025-07-06
+
+### Fixed
+- Installation manifest (.claude-install-manifest) now correctly records all installed files
+  - Fixed issue where INSTALLED_FILES array was being modified in a subshell
+  - Changed install_component to use global variable for file count instead of echo
+  - Manifest now properly tracks files for clean updates and removals
+
 ## [2.1.0] - 2025-07-06
 
 ### Added
@@ -195,7 +203,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.6.0...v2.0.0
 [1.6.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.5.0...v1.6.0
