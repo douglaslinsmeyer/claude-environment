@@ -7,7 +7,8 @@
 set -e  # Exit on any error
 
 # Default values
-REPO_URL="https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/main"
+# Allow REPO_URL to be overridden by environment variable (useful for CI/testing)
+REPO_URL="${CLAUDE_ENV_REPO_URL:-https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/main}"
 INSTALL_TYPE="global"
 INSTALL_COMMANDS=true
 INSTALL_PERSONAS=true

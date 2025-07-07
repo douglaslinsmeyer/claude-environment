@@ -106,6 +106,9 @@ jobs:
             INSTALL_FLAG="--local"
           fi
           
+          # Use local files for installation test instead of remote
+          export CLAUDE_ENV_REPO_URL="file://$GITHUB_WORKSPACE"
+          
           # Run installation
           bash install.sh $INSTALL_FLAG --force
           
@@ -139,6 +142,9 @@ jobs:
           export HOME="$GITHUB_WORKSPACE/test-home"
           mkdir -p "$HOME"
           
+          # Use local files for installation test
+          export CLAUDE_ENV_REPO_URL="file://$GITHUB_WORKSPACE"
+          
           # First installation
           bash install.sh --force
           
@@ -168,6 +174,9 @@ jobs:
         run: |
           export HOME="$GITHUB_WORKSPACE/test-home"
           mkdir -p "$HOME"
+          
+          # Use local files for installation test
+          export CLAUDE_ENV_REPO_URL="file://$GITHUB_WORKSPACE"
           
           # Run dry run
           output=$(bash install.sh --dry-run 2>&1)
