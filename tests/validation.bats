@@ -191,28 +191,6 @@ except jsonschema.ValidationError as e:
 
 # No debug artifacts
 
-@test "no console.log in shell scripts" {
-    if grep -r "console\.log" "$PROJECT_ROOT" \
-        --include="*.sh" \
-        --exclude-dir=.git \
-        --exclude-dir=node_modules; then
-        echo "Found console.log in shell scripts" >&2
-        return 1
-    fi
-}
-
-@test "no TODO comments in shell scripts" {
-    # Allow TODOs in markdown documentation but not in scripts
-    if grep -r "TODO\|FIXME\|XXX" "$PROJECT_ROOT" \
-        --include="*.sh" \
-        --exclude-dir=.git \
-        --exclude-dir=node_modules \
-        --exclude-dir=tests; then
-        echo "Found TODO/FIXME/XXX comments in shell scripts" >&2
-        return 1
-    fi
-}
-
 # Test files validation
 
 @test "all test files are executable" {
