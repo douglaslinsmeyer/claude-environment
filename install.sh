@@ -376,15 +376,17 @@ install_component() {
 
         if download_file "$file" "$target_path"; then
             ((file_count += 1))
-            # Track the installed file
-            if [[ -n "$special_target" ]]; then
-                INSTALLED_FILES+=("$special_target")
-            else
-                INSTALLED_FILES+=("$file")
-            fi
         else
             print_warning "Failed to download: $file"
             ((failed_count += 1))
+            continue
+        fi
+
+        # Track the installed file (even in dry-run mode)
+        if [[ -n "$special_target" ]]; then
+            INSTALLED_FILES+=("$special_target")
+        else
+            INSTALLED_FILES+=("$file")
         fi
     done
 
@@ -396,7 +398,8 @@ install_component() {
         print_warning "$component ($failed_count files failed)"
     fi
 
-    echo "$file_count"
+    # Return the count via global variable instead of echo to avoid subshell issues
+    COMPONENT_FILE_COUNT=$file_count
 }
 
 # Track installed files globally
@@ -438,6 +441,9 @@ EOF
 main() {
     parse_args "$@"
 
+    # Reset installed files tracking
+    INSTALLED_FILES=()
+
     # Load manifest data early
     load_manifest_data
 
@@ -477,10 +483,10 @@ main() {
 
     # Install components
     local total_files=0
+    COMPONENT_FILE_COUNT=0
     for component in "commands" "personas" "claude-files" "templates"; do
-        local count
-        count=$(install_component "$component" "$install_dir")
-        ((total_files += count))
+        install_component "$component" "$install_dir"
+        ((total_files += COMPONENT_FILE_COUNT))
     done
 
     # Create manifest
