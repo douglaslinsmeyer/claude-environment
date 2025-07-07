@@ -237,17 +237,17 @@ EOF
     # Test dry run functionality
     DRY_RUN=true
     HOME="$TEST_DIR"
-    
+
     # Create installation directory should not happen
     local install_dir
     install_dir=$(get_install_dir)
-    
+
     # Test that download_file respects dry run
     local output
     output=$(download_file "test.md" "$TEST_DIR/test.md" 2>&1)
     [[ "$output" == *"Would download"* ]]
     [[ ! -f "$TEST_DIR/test.md" ]]
-    
+
     # Test that create_manifest respects dry run
     create_manifest "$TEST_DIR" "1.0.0"
     [[ ! -f "$TEST_DIR/.claude-install-manifest" ]]

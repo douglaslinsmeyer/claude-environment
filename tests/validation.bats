@@ -67,7 +67,8 @@ setup() {
 }
 
 @test "install.sh has correct REPO_URL" {
-    grep -q 'REPO_URL="https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/main"' "$PROJECT_ROOT/install.sh"
+    # Check that REPO_URL uses environment variable with fallback
+    grep -qE 'REPO_URL="\$\{CLAUDE_ENV_REPO_URL:-https://raw\.githubusercontent\.com/douglaslinsmeyer/claude-environment/main\}"' "$PROJECT_ROOT/install.sh"
 }
 
 @test "install.sh has valid syntax" {
