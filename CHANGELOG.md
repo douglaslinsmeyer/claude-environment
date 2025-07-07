@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.1] - 2025-07-07
+
+### Fixed
+- Fixed failing tests by removing references to deprecated claude-files component
+  - Updated manifest.json to remove deleted template files
+  - Removed claude-files component from install.sh script
+  - Removed obsolete test for claude-files in install.bats
+- Fixed CI workflow failures
+  - Removed hard-coded claude-files check from validation tests
+  - Updated CI installation tests to remove CLAUDE.md verification
+  - Changed update test to use README-template.md instead of removed CLAUDE.md
+- Fixed ShellCheck warnings in test-helpers.sh by declaring variables separately from assignment
+- Fixed install.sh to respect --force flag when version is already up to date
+
+### Added
+- CI brittleness analysis documentation with recommendations for improving test resilience
+- Test helper script for dynamic manifest validation (tests/test-helpers.sh)
+- JSON schema for manifest.json validation (tests/manifest-schema.json)
+- Version consistency tests to ensure synchronization across files
+- Dynamic component validation in tests - tests now adapt to manifest.json structure
+- Improved CI test resilience with dynamic file verification
+
+## [2.2.0] - 2025-07-07
+
+### Added
+- New `/generate-readme` command for generating accurate README.md files from project analysis
+  - Analyzes project structure, dependencies, and configuration files
+  - Creates documentation based on actual codebase state without embellishment
+  - Located in commands/coding/ directory alongside other development commands
+
+### Changed
+- Updated documentation to reflect that slash commands do not require prefix scopes
+  - Removed `/user:` prefix from all command examples in README
+  - Commands are now documented as directly accessible (e.g., `/code-review` instead of `/user:code-review`)
+
+### Removed
+- Removed deprecated claude-files directory and its contents
+  - global-CLAUDE.md moved to standard CLAUDE.md location
+  - Project template files (data-science, mobile-app, web-dev)
+  - prompt-best-practices.md
+- Removed deprecated template files
+  - CLAUDE-template.md
+  - project-setup.md
+
 ## [2.1.1] - 2025-07-06
 
 ### Fixed
@@ -37,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Comprehensive slash command usage documentation in README
-  - Examples for all commands using proper `/user:` prefix syntax
+  - Examples for all commands with slash command syntax
   - Natural language argument examples
   - Tips for effective command usage
 
@@ -203,7 +247,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.6.0...v2.0.0

@@ -312,15 +312,6 @@ get_special_mapping() {
     if command -v jq >/dev/null 2>&1; then
         # Use jq to get the special mapping
         echo "$MANIFEST_DATA" | jq -r ".components.\"$component\".special_mappings.\"$file\"? // empty" 2>/dev/null
-    else
-        # Basic parsing for special mappings
-        # For now, handle the known case directly
-        if [[ "$component" == "claude-files" && "$file" == "claude-files/global-CLAUDE.md" ]]; then
-            # Check if special_mappings exists in manifest
-            if [[ "$MANIFEST_DATA" =~ \"special_mappings\" ]]; then
-                echo "CLAUDE.md"
-            fi
-        fi
     fi
 }
 
@@ -350,16 +341,6 @@ install_component() {
         [[ -n "$file" ]] && files+=("$file")
     done < <(get_component_files "$component")
 
-    # Special handling for CLAUDE.md
-    if [[ "$component" == "claude-files" ]]; then
-        local claude_file="$install_dir/CLAUDE.md"
-        if [[ -f "$claude_file" && "$FORCE" == "false" && "$DRY_RUN" == "false" ]]; then
-            if ! confirm_action "CLAUDE.md already exists. Overwrite it?"; then
-                # Skip CLAUDE.md but continue with other files
-                files=("${files[@]/claude-files\/global-CLAUDE.md/}")
-            fi
-        fi
-    fi
 
     # Download each file
     for file in "${files[@]}"; do
@@ -422,7 +403,6 @@ create_manifest() {
 
     [[ "$INSTALL_COMMANDS" == "true" ]] && components+=("commands")
     [[ "$INSTALL_PERSONAS" == "true" ]] && components+=("personas")
-    components+=("claude-files")
     [[ "$INSTALL_TEMPLATES" == "true" ]] && components+=("templates")
 
     # Create manifest with file list
@@ -463,7 +443,7 @@ main() {
     print_info "Remote version: $remote_version"
 
     # Check if already installed and up to date
-    if [[ -n "$existing_version" && "$existing_version" == "$remote_version" && "$DRY_RUN" == "false" ]]; then
+    if [[ -n "$existing_version" && "$existing_version" == "$remote_version" && "$DRY_RUN" == "false" && "$FORCE" == "false" ]]; then
         print_success "claude-config v$existing_version already installed and up to date."
         exit 0
     fi
@@ -484,7 +464,7 @@ main() {
     # Install components
     local total_files=0
     COMPONENT_FILE_COUNT=0
-    for component in "commands" "personas" "claude-files" "templates"; do
+    for component in "commands" "personas" "templates"; do
         install_component "$component" "$install_dir"
         ((total_files += COMPONENT_FILE_COUNT))
     done
