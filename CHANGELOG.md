@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed hard-coded claude-files check from validation tests
   - Updated CI installation tests to remove CLAUDE.md verification
   - Changed update test to use README-template.md instead of removed CLAUDE.md
+- Fixed ShellCheck warnings in test-helpers.sh by declaring variables separately from assignment
+- Fixed install.sh to respect --force flag when version is already up to date
 
 ### Added
 - CI brittleness analysis documentation with recommendations for improving test resilience

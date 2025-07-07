@@ -48,11 +48,13 @@ verify_component_structure() {
 
     if has_jq; then
         # Check component has description
-        local desc=$(jq -r ".components[\"$component\"].description?" "$manifest" 2>/dev/null)
+        local desc
+        desc=$(jq -r ".components[\"$component\"].description?" "$manifest" 2>/dev/null)
         [[ -n "$desc" && "$desc" != "null" ]] || return 1
 
         # Check component has files array
-        local files=$(jq -r ".components[\"$component\"].files?" "$manifest" 2>/dev/null)
+        local files
+        files=$(jq -r ".components[\"$component\"].files?" "$manifest" 2>/dev/null)
         [[ -n "$files" && "$files" != "null" ]] || return 1
     fi
     return 0
@@ -81,14 +83,16 @@ check_manifest_required_fields() {
 
     if has_jq; then
         # Check version exists
-        local version=$(jq -r '.version' "$manifest" 2>/dev/null)
+        local version
+        version=$(jq -r '.version' "$manifest" 2>/dev/null)
         if [[ -z "$version" || "$version" == "null" ]]; then
             echo "Missing required field: version"
             ((errors++))
         fi
 
         # Check components exists
-        local components=$(jq -r '.components' "$manifest" 2>/dev/null)
+        local components
+        components=$(jq -r '.components' "$manifest" 2>/dev/null)
         if [[ -z "$components" || "$components" == "null" ]]; then
             echo "Missing required field: components"
             ((errors++))

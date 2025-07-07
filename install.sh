@@ -443,7 +443,7 @@ main() {
     print_info "Remote version: $remote_version"
 
     # Check if already installed and up to date
-    if [[ -n "$existing_version" && "$existing_version" == "$remote_version" && "$DRY_RUN" == "false" ]]; then
+    if [[ -n "$existing_version" && "$existing_version" == "$remote_version" && "$DRY_RUN" == "false" && "$FORCE" == "false" ]]; then
         print_success "claude-config v$existing_version already installed and up to date."
         exit 0
     fi
