@@ -246,15 +246,15 @@ get_component_files() {
     case "$component" in
         "commands")
             files=(
-                "commands/coding/debug-helper.md"
                 "commands/coding/code-review.md"
-                "commands/coding/refactor-guide.md"
-                "commands/coding/test-writer.md"
+                "commands/coding/debug.md"
+                "commands/coding/refactor.md"
+                "commands/coding/write-tests.md"
                 "commands/writing/blog-post.md"
                 "commands/writing/documentation.md"
                 "commands/writing/email-draft.md"
                 "commands/writing/technical-article.md"
-                "commands/analysis/data-exploration.md"
+                "commands/analysis/explore-data.md"
                 "commands/analysis/research-summary.md"
                 "commands/analysis/trend-analysis.md"
             )

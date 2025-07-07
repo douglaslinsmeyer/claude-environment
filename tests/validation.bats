@@ -16,10 +16,11 @@ setup() {
     done < <(find "$PROJECT_ROOT" -name "*.md" -not -path "*/\.*" -not -path "*/node_modules/*")
 }
 
-@test "all markdown files start with header" {
+@test "all markdown files start with header or YAML frontmatter" {
     while IFS= read -r file; do
         first_line=$(head -n 1 "$file")
-        [[ "$first_line" == "#"* ]] || fail "No header in: $file"
+        # Allow either markdown header (#) or YAML frontmatter (---)
+        [[ "$first_line" == "#"* ]] || [[ "$first_line" == "---" ]] || fail "No header or frontmatter in: $file"
     done < <(find "$PROJECT_ROOT" -name "*.md" -not -path "*/\.*" -not -path "*/node_modules/*")
 }
 
@@ -98,20 +99,24 @@ setup() {
     [[ "$readme_content" == *"## Installation Options"* ]]
 }
 
-# Workflow file validation
+# Command file validation
 
-@test "all workflow files have proper structure" {
+@test "all command files have proper structure" {
     for file in "$PROJECT_ROOT"/commands/*/*.md; do
         [[ ! -f "$file" ]] && continue
 
         content=$(cat "$file")
         basename=$(basename "$file")
+        first_line=$(head -n 1 "$file")
 
-        # Check for title
-        [[ "$content" == *"# "* ]] || fail "No title in workflow: $basename"
+        # Check for YAML frontmatter
+        [[ "$first_line" == "---" ]] || fail "No YAML frontmatter in command: $basename"
 
-        # Check for sections
-        [[ "$content" == *"## "* ]] || fail "No sections in workflow: $basename"
+        # Check for description in frontmatter
+        [[ "$content" == *"description:"* ]] || fail "No description in command: $basename"
+
+        # Check for $ARGUMENTS placeholder
+        [[ "$content" == *"\$ARGUMENTS"* ]] || fail "No \$ARGUMENTS placeholder in command: $basename"
     done
 }
 
