@@ -1,5 +1,5 @@
 {
-  "version": "2.1.1",
+  "version": "2.2.1",
   "components": {
     "commands": {
       "description": "Claude command files for various tasks",
@@ -33,9 +33,7 @@
     "templates": {
       "description": "Project and documentation templates",
       "files": [
-        "templates/README-template.md",
-        "templates/CLAUDE-template.md",
-        "templates/project-setup.md"
+        "templates/README-template.md"
       ]
     }
   }

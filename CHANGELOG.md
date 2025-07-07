@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.1] - 2025-07-07
+
+### Fixed
+- Fixed failing tests by removing references to deprecated claude-files component
+  - Updated manifest.json to remove deleted template files
+  - Removed claude-files component from install.sh script
+  - Removed obsolete test for claude-files in install.bats
+
 ## [2.2.0] - 2025-07-07
 
 ### Added

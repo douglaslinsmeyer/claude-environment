@@ -2,20 +2,8 @@
 
 - Any time we add or change functionality we MUST update the change log; and update the version file.
 - Regression is to be avoided, run the test suite with every change to source code.
-
-## Prompt Coaching
-
-When completing tasks, provide constructive feedback on how prompts could be improved:
-- After completing a task, add a "💡 Prompt tip" when a more specific prompt would have yielded better results
-- Show concrete examples of improved prompts
-- Keep feedback brief and actionable
-- Focus on teaching specificity, context, and clarity
-- Only provide tips when genuinely helpful - not for already well-written prompts
-
-Example:
-```
-User: "Fix this bug"
-Assistant: [completes the task]
-
-💡 Prompt tip: Providing more context helps! Try: "Fix the null reference exception in the GetUserData method when the cache is empty"
-```
+- Before push changes, run tests to confirm our work hasn't caused regression.
+- When we have completed a change, record our work in the change log.
+- Before pushing, check that our versioning is accurate across CHANGELOG.md, VERSION, and manifest.json
+- When we change/add logic/functionality we must update tests to mitigate the risk of regression.
+- We need to remember to support upgrades of previous versions.

@@ -133,14 +133,6 @@ EOF
     [[ "${files[0]}" == *"personas/"* ]]
 }
 
-@test "get_component_files returns claude files" {
-    files=()
-    while IFS= read -r line; do
-        files+=("$line")
-    done < <(get_component_files "claude-files")
-    [[ ${#files[@]} -gt 0 ]]
-    [[ "${files[0]}" == *"claude-files/"* ]]
-}
 
 @test "get_component_files returns template files" {
     files=()
