@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.2] - 2025-07-06
+
+### Changed
+- Optimized test suite for better efficiency and maintainability
+  - Reduced install.bats from 48 to 34 tests (29% reduction) while maintaining full regression protection
+  - Consolidated redundant test cases into comprehensive single tests
+  - Removed tests that checked implementation details rather than behavior
+  - Improved test structure by grouping similar scenarios
+
+### Fixed
+- Updated tests after claude-files component removal to ensure compatibility
+- Fixed ShellCheck style issues in test files
+- Restored executable permissions on test files
+
+### Removed
+- Redundant tests for get_component_files (4 tests → 1 comprehensive test)
+- Duplicate get_remote_version error handling tests (3 tests → 1)
+- Overly complex user interaction tests that tested implementation details
+- Tests referencing non-existent claude-files component
+
 ## [2.2.1] - 2025-07-07
 
 ### Fixed
@@ -247,7 +267,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.2...HEAD
+[2.2.2]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.0...v2.2.2
 [2.2.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.0.0...v2.1.0
