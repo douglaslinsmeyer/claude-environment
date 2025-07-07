@@ -91,155 +91,167 @@ curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/
 
 ## Using Slash Commands
 
-The installed commands can be used as slash commands in Claude Code. Commands use the format `/<prefix>:<command-name> [arguments]` where prefix is either `project:` for project-specific commands or `user:` for personal commands. Since these are installed as personal commands, they use the `user:` prefix.
+The installed commands can be used as slash commands in Claude Code. Once loaded, commands are available directly without any prefix scope.
 
 ### Coding Commands
 
-#### `/user:code-review` - Review code for quality and best practices
+#### `/code-review` - Review code for quality and best practices
 ```bash
 # Review a specific file
-/user:code-review src/main.py
+/code-review src/main.py
 
 # Review recent changes
-/user:code-review analyze the recent changes in UserService
+/code-review analyze the recent changes in UserService
 
 # Review code you paste or describe
-/user:code-review check this function for security issues: [paste code]
+/code-review check this function for security issues: [paste code]
 ```
 
-#### `/user:debug` - Debug issues systematically
+#### `/debug` - Debug issues systematically
 ```bash
 # Debug an error message
-/user:debug TypeError: Cannot read property 'length' of undefined
+/debug TypeError: Cannot read property 'length' of undefined
 
 # Debug with context
-/user:debug my API returns 500 when I try to update a user
+/debug my API returns 500 when I try to update a user
 
 # Debug test failures
-/user:debug test failing with timeout in user authentication spec
+/debug test failing with timeout in user authentication spec
 ```
 
-#### `/user:refactor` - Improve code structure and quality
+#### `/refactor` - Improve code structure and quality
 ```bash
 # Refactor a specific component
-/user:refactor improve the UserProfile.jsx component
+/refactor improve the UserProfile.jsx component
 
 # Refactor for a specific goal
-/user:refactor optimize database queries in UserService
+/refactor optimize database queries in UserService
 
 # Refactor code snippet
-/user:refactor simplify this nested if-else chain: [paste code]
+/refactor simplify this nested if-else chain: [paste code]
 ```
 
-#### `/user:write-tests` - Generate comprehensive test suites
+#### `/write-tests` - Generate comprehensive test suites
 ```bash
 # Write tests for a function
-/user:write-tests create tests for calculateDiscount function
+/write-tests create tests for calculateDiscount function
 
 # Write integration tests
-/user:write-tests integration tests for user registration flow
+/write-tests integration tests for user registration flow
 
 # Write tests for pasted code
-/user:write-tests unit tests for: [paste code]
+/write-tests unit tests for: [paste code]
+```
+
+#### `/generate-readme` - Generate accurate README.md from project analysis
+```bash
+# Generate README for current project
+/generate-readme .
+
+# Generate README for specific directory
+/generate-readme ~/my-project
+
+# Generate README with focus on specific aspects
+/generate-readme analyze build process and dependencies in detail
 ```
 
 ### Writing Commands
 
-#### `/user:documentation` - Create technical documentation
+#### `/documentation` - Create technical documentation
 ```bash
 # Document an API
-/user:documentation create API docs for user authentication endpoints
+/documentation create API docs for user authentication endpoints
 
 # Create a README
-/user:documentation write README for my CLI tool that processes CSV files
+/documentation write README for my CLI tool that processes CSV files
 
 # Document a feature
-/user:documentation document real-time collaboration feature in our app
+/documentation document real-time collaboration feature in our app
 ```
 
-#### `/user:blog-post` - Write technical blog posts
+#### `/blog-post` - Write technical blog posts
 ```bash
 # Write about a technology
-/user:blog-post write about getting started with WebAssembly
+/blog-post write about getting started with WebAssembly
 
 # Write a tutorial
-/user:blog-post tutorial on building a REST API with Node.js
+/blog-post tutorial on building a REST API with Node.js
 
 # Write about your experience
-/user:blog-post our journey migrating from monolith to microservices
+/blog-post our journey migrating from monolith to microservices
 ```
 
-#### `/user:email-draft` - Draft professional emails
+#### `/email-draft` - Draft professional emails
 ```bash
 # Project update email
-/user:email-draft weekly status update for the mobile app project
+/email-draft weekly status update for the mobile app project
 
 # Meeting request
-/user:email-draft meeting request to discuss API design with backend team
+/email-draft meeting request to discuss API design with backend team
 
 # Technical proposal
-/user:email-draft proposal for adopting TypeScript in our frontend codebase
+/email-draft proposal for adopting TypeScript in our frontend codebase
 ```
 
-#### `/user:technical-article` - Write in-depth technical articles
+#### `/technical-article` - Write in-depth technical articles
 ```bash
 # Architecture article
-/user:technical-article explain event-driven microservices architecture
+/technical-article explain event-driven microservices architecture
 
 # Comparison article
-/user:technical-article compare PostgreSQL vs MongoDB for our use case
+/technical-article compare PostgreSQL vs MongoDB for our use case
 
 # Best practices article
-/user:technical-article best practices for securing REST APIs
+/technical-article best practices for securing REST APIs
 ```
 
 ### Analysis Commands
 
-#### `/user:explore-data` - Perform exploratory data analysis
+#### `/explore-data` - Perform exploratory data analysis
 ```bash
 # Analyze a dataset
-/user:explore-data analyze user_engagement_metrics.csv
+/explore-data analyze user_engagement_metrics.csv
 
 # Analyze specific aspects
-/user:explore-data find correlation between user age and purchase frequency
+/explore-data find correlation between user age and purchase frequency
 
 # Data quality check
-/user:explore-data check customer database for inconsistencies
+/explore-data check customer database for inconsistencies
 ```
 
-#### `/user:research-summary` - Research and summarize topics
+#### `/research-summary` - Research and summarize topics
 ```bash
 # Technology research
-/user:research-summary GraphQL adoption in enterprise applications
+/research-summary GraphQL adoption in enterprise applications
 
 # Market research
-/user:research-summary compare cloud storage solutions for our needs
+/research-summary compare cloud storage solutions for our needs
 
 # Best practices research
-/user:research-summary microservices testing strategies and tools
+/research-summary microservices testing strategies and tools
 ```
 
-#### `/user:trend-analysis` - Analyze trends and patterns
+#### `/trend-analysis` - Analyze trends and patterns
 ```bash
 # Analyze metrics
-/user:trend-analysis monthly active users over the last year
+/trend-analysis monthly active users over the last year
 
 # Analyze performance
-/user:trend-analysis API response times by endpoint over past quarter
+/trend-analysis API response times by endpoint over past quarter
 
 # Market trends
-/user:trend-analysis JavaScript framework popularity and trends in 2024
+/trend-analysis JavaScript framework popularity and trends in 2024
 ```
 
 ### Tips for Using Commands
 
-1. **Personal commands**: These commands are installed in your personal Claude configuration and use the `/user:` prefix
+1. **Personal commands**: These commands are installed in your personal Claude configuration
 2. **Be specific**: The more context you provide in arguments, the better the output
 3. **Natural language arguments**: Write arguments as you would describe the task naturally
 4. **Combine with context**: You can paste code, logs, or data directly in your command arguments
-5. **Chain commands**: Use multiple commands in sequence, like `/user:debug` followed by `/user:refactor`
+5. **Chain commands**: Use multiple commands in sequence, like `/debug` followed by `/refactor`
 6. **Customize output**: Add specific requirements to your command arguments
-7. **Project-specific commands**: You can also create custom commands in any project's `.claude/commands/` directory using the `/project:` prefix
+7. **Project-specific commands**: You can also create custom commands in any project's `.claude/commands/` directory
 
 ## Repository Structure
 
@@ -253,6 +265,7 @@ claude-config/
 │   ├── coding/
 │   │   ├── code-review.md
 │   │   ├── debug.md
+│   │   ├── generate-readme.md
 │   │   ├── refactor.md
 │   │   └── write-tests.md
 │   ├── writing/

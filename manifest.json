@@ -6,6 +6,7 @@
       "files": [
         "commands/coding/code-review.md",
         "commands/coding/debug.md",
+        "commands/coding/generate-readme.md",
         "commands/coding/refactor.md",
         "commands/coding/write-tests.md",
         "commands/writing/blog-post.md",
@@ -28,19 +29,6 @@
         "personas/senior-devops-engineer.md",
         "personas/cli-developer.md"
       ]
-    },
-    "claude-files": {
-      "description": "Main Claude configuration files",
-      "files": [
-        "claude-files/global-CLAUDE.md",
-        "claude-files/prompt-best-practices.md",
-        "claude-files/project-templates/web-dev-CLAUDE.md",
-        "claude-files/project-templates/data-science-CLAUDE.md",
-        "claude-files/project-templates/mobile-app-CLAUDE.md"
-      ],
-      "special_mappings": {
-        "claude-files/global-CLAUDE.md": "CLAUDE.md"
-      }
     },
     "templates": {
       "description": "Project and documentation templates",
