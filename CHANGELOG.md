@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Renamed "workflows" directory to "commands" for better CLI-focused terminology
+  - Updated all references in manifest.json, install.sh, and test files
+  - Updated installer flag from `--no-workflows` to `--no-commands`
+  - Updated documentation to reflect new terminology
+
 ## [1.6.0] - 2025-07-06
 
 ### Added
@@ -16,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Expertise in CLI frameworks across multiple languages (Cobra, Clap, Click, Oclif)
   - Emphasis on error handling, progress feedback, and cross-platform compatibility
   - Includes terminal UI design and distribution strategies
-- Enhanced code review workflow with additional review categories
+- Enhanced code review command with additional review categories
   - Style & Conventions checks
   - Dependencies review
   - Version Control best practices

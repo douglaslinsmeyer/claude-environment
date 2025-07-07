@@ -44,7 +44,7 @@ setup() {
 
         # Check components exist
         components=$(jq -r '.components | keys[]' "$PROJECT_ROOT/manifest.json" 2>/dev/null)
-        [[ "$components" == *"workflows"* ]]
+        [[ "$components" == *"commands"* ]]
         [[ "$components" == *"personas"* ]]
         [[ "$components" == *"claude-files"* ]]
         [[ "$components" == *"templates"* ]]
@@ -101,7 +101,7 @@ setup() {
 # Workflow file validation
 
 @test "all workflow files have proper structure" {
-    for file in "$PROJECT_ROOT"/workflows/*/*.md; do
+    for file in "$PROJECT_ROOT"/commands/*/*.md; do
         [[ ! -f "$file" ]] && continue
 
         content=$(cat "$file")

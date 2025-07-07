@@ -49,10 +49,10 @@ teardown() {
     [[ "$INSTALL_TYPE" == "local" ]]
 }
 
-@test "parse_args handles --no-workflows flag" {
-    INSTALL_WORKFLOWS=true
-    parse_args --no-workflows
-    [[ "$INSTALL_WORKFLOWS" == "false" ]]
+@test "parse_args handles --no-commands flag" {
+    INSTALL_COMMANDS=true
+    parse_args --no-commands
+    [[ "$INSTALL_COMMANDS" == "false" ]]
 }
 
 @test "parse_args handles --no-personas flag" {
@@ -75,13 +75,13 @@ teardown() {
 
 @test "parse_args handles multiple flags" {
     INSTALL_TYPE="global"
-    INSTALL_WORKFLOWS=true
+    INSTALL_COMMANDS=true
     FORCE=false
 
-    parse_args --local --no-workflows --force
+    parse_args --local --no-commands --force
 
     [[ "$INSTALL_TYPE" == "local" ]]
-    [[ "$INSTALL_WORKFLOWS" == "false" ]]
+    [[ "$INSTALL_COMMANDS" == "false" ]]
     [[ "$FORCE" == "true" ]]
 }
 
@@ -112,13 +112,13 @@ EOF
     [[ -z "$version" ]]
 }
 
-@test "get_component_files returns workflow files" {
+@test "get_component_files returns command files" {
     local files=()
     while IFS= read -r line; do
         files+=("$line")
-    done < <(get_component_files "workflows")
+    done < <(get_component_files "commands")
     [[ ${#files[@]} -gt 0 ]]
-    [[ "${files[0]}" == *"workflows/"* ]]
+    [[ "${files[0]}" == *"commands/"* ]]
 }
 
 @test "get_component_files returns persona files" {
@@ -159,7 +159,7 @@ EOF
 @test "create_manifest creates valid JSON" {
     DRY_RUN=false
     INSTALL_TYPE="local"
-    INSTALL_WORKFLOWS=true
+    INSTALL_COMMANDS=true
     INSTALL_PERSONAS=true
     INSTALL_TEMPLATES=true
     INSTALLED_FILES=("test1.md" "test2.md")
@@ -184,23 +184,23 @@ EOF
 @test "remove_old_files removes listed files" {
     DRY_RUN=false
     local test_dir="$TEST_DIR/.claude"
-    mkdir -p "$test_dir/workflows"
+    mkdir -p "$test_dir/commands"
 
     # Create test files
-    echo "test" > "$test_dir/workflows/test.md"
+    echo "test" > "$test_dir/commands/test.md"
     echo "test" > "$test_dir/CLAUDE.md"
 
     # Create manifest
     cat > "$test_dir/.claude-install-manifest" << EOF
 {
   "version": "0.9.0",
-  "files": ["workflows/test.md", "CLAUDE.md"]
+  "files": ["commands/test.md", "CLAUDE.md"]
 }
 EOF
 
     remove_old_files "$test_dir"
 
-    [[ ! -f "$test_dir/workflows/test.md" ]]
+    [[ ! -f "$test_dir/commands/test.md" ]]
     [[ ! -f "$test_dir/CLAUDE.md" ]]
     [[ -f "$test_dir/.claude-install-manifest" ]]
 }
@@ -215,7 +215,7 @@ EOF
     [[ "$status" -eq 0 ]]
     [[ -d "$TEST_DIR/.claude" ]]
     [[ -f "$TEST_DIR/.claude/CLAUDE.md" ]]
-    [[ -d "$TEST_DIR/.claude/workflows" ]]
+    [[ -d "$TEST_DIR/.claude/commands" ]]
     [[ -d "$TEST_DIR/.claude/personas" ]]
     [[ -d "$TEST_DIR/.claude/templates" ]]
 }

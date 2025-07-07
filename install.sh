@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Claude Configuration Installer
-# Installs Claude workflows, personas, and configuration files
+# Installs Claude commands, personas, and configuration files
 # Works on macOS and Linux (including WSL)
 
 set -e  # Exit on any error
@@ -9,7 +9,7 @@ set -e  # Exit on any error
 # Default values
 REPO_URL="https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/main"
 INSTALL_TYPE="global"
-INSTALL_WORKFLOWS=true
+INSTALL_COMMANDS=true
 INSTALL_PERSONAS=true
 INSTALL_TEMPLATES=true
 FORCE=false
@@ -40,7 +40,7 @@ USAGE:
 OPTIONS:
     --global          Install to ~/.claude (default)
     --local           Install to current directory
-    --no-workflows    Skip workflow files
+    --no-commands     Skip command files
     --no-personas     Skip persona files
     --no-templates    Skip template files
     --force           Skip confirmation prompts
@@ -72,8 +72,8 @@ parse_args() {
                 INSTALL_TYPE="local"
                 shift
                 ;;
-            --no-workflows)
-                INSTALL_WORKFLOWS=false
+            --no-commands)
+                INSTALL_COMMANDS=false
                 shift
                 ;;
             --no-personas)
@@ -244,19 +244,19 @@ get_component_files() {
     local files=()
 
     case "$component" in
-        "workflows")
+        "commands")
             files=(
-                "workflows/coding/debug-helper.md"
-                "workflows/coding/code-review.md"
-                "workflows/coding/refactor-guide.md"
-                "workflows/coding/test-writer.md"
-                "workflows/writing/blog-post.md"
-                "workflows/writing/documentation.md"
-                "workflows/writing/email-draft.md"
-                "workflows/writing/technical-article.md"
-                "workflows/analysis/data-exploration.md"
-                "workflows/analysis/research-summary.md"
-                "workflows/analysis/trend-analysis.md"
+                "commands/coding/debug-helper.md"
+                "commands/coding/code-review.md"
+                "commands/coding/refactor-guide.md"
+                "commands/coding/test-writer.md"
+                "commands/writing/blog-post.md"
+                "commands/writing/documentation.md"
+                "commands/writing/email-draft.md"
+                "commands/writing/technical-article.md"
+                "commands/analysis/data-exploration.md"
+                "commands/analysis/research-summary.md"
+                "commands/analysis/trend-analysis.md"
             )
             ;;
         "personas")
@@ -266,6 +266,8 @@ get_component_files() {
                 "personas/data-analyst.md"
                 "personas/product-manager.md"
                 "personas/researcher.md"
+                "personas/senior-devops-engineer.md"
+                "personas/cli-developer.md"
             )
             ;;
         "claude-files")
@@ -299,8 +301,8 @@ install_component() {
 
     # Check if component should be skipped
     case "$component" in
-        "workflows")
-            [[ "$INSTALL_WORKFLOWS" == "false" ]] && return 0
+        "commands")
+            [[ "$INSTALL_COMMANDS" == "false" ]] && return 0
             ;;
         "personas")
             [[ "$INSTALL_PERSONAS" == "false" ]] && return 0
@@ -381,7 +383,7 @@ create_manifest() {
     timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     local components=()
 
-    [[ "$INSTALL_WORKFLOWS" == "true" ]] && components+=("workflows")
+    [[ "$INSTALL_COMMANDS" == "true" ]] && components+=("commands")
     [[ "$INSTALL_PERSONAS" == "true" ]] && components+=("personas")
     components+=("claude-files")
     [[ "$INSTALL_TEMPLATES" == "true" ]] && components+=("templates")
@@ -438,7 +440,7 @@ main() {
 
     # Install components
     local total_files=0
-    for component in "workflows" "personas" "claude-files" "templates"; do
+    for component in "commands" "personas" "claude-files" "templates"; do
         local count
         count=$(install_component "$component" "$install_dir")
         ((total_files += count))
