@@ -7,11 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2025-07-06
+
+### Added
+- Comprehensive slash command usage documentation in README
+  - Examples for all commands using proper `/user:` prefix syntax
+  - Natural language argument examples
+  - Tips for effective command usage
+
 ### Changed
-- Renamed "workflows" directory to "commands" for better CLI-focused terminology
+- **BREAKING**: Renamed "workflows" directory to "commands" for better CLI-focused terminology
   - Updated all references in manifest.json, install.sh, and test files
   - Updated installer flag from `--no-workflows` to `--no-commands`
   - Updated documentation to reflect new terminology
+- Converted all command files to Claude Code slash command format
+  - Added YAML frontmatter with descriptions to all commands
+  - Rewrote commands to use `$ARGUMENTS` placeholder
+  - Simplified command structure for better usability
+  - Renamed some files for consistency (e.g., `debug-helper.md` → `debug.md`)
+
+### Removed
+- Removed verbose workflow instructions in favor of concise slash commands
+- Removed detailed checklists and templates from command files
 
 ## [1.6.0] - 2025-07-06
 
@@ -160,7 +177,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.6.0...v2.0.0
 [1.6.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v1.3.0...v1.4.0
