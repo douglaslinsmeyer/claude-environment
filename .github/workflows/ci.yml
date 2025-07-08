@@ -121,8 +121,7 @@ jobs:
           test -d "$HOME/.claude"
           
           # Test local installation
-          cd "$GITHUB_WORKSPACE/test-local"
-          mkdir -p test-local && cd test-local
+          mkdir -p "$GITHUB_WORKSPACE/test-local" && cd "$GITHUB_WORKSPACE/test-local"
           bash "$GITHUB_WORKSPACE/install.sh" --local --force
           test -d ".claude"
 
