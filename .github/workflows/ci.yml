@@ -224,14 +224,9 @@ jobs:
           # TODO: Migrate to full semantic-release in the future
           current_version=$(cat VERSION)
           
-          # Create tag
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git tag -a "v$current_version" -m "Release version $current_version"
-          git push origin "v$current_version"
-          
-          # Create GitHub release
+          # gh CLI is pre-installed in GitHub Actions
+          # Create release and tag in one command
           gh release create "v$current_version" \
             --title "Release $current_version" \
             --notes-file <(bash scripts/generate-release-notes.sh $current_version) \
-            --verify-tag
+            --target ${{ github.sha }}
