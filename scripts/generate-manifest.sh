@@ -163,7 +163,7 @@ expand_component_files() {
     local sorted_files=()
     while IFS= read -r file; do
         [[ -n "$file" ]] && sorted_files+=("$file")
-    done < <(printf '%s\n' "${all_files[@]}" | sort -u)
+    done < <(printf '%s\n' "${all_files[@]}" | LC_ALL=C sort -u)
     all_files=("${sorted_files[@]}")
     
     # Apply exclusion patterns
@@ -197,7 +197,7 @@ expand_component_files() {
     done
     
     # Sort files for deterministic output
-    printf '%s\n' "${final_files[@]}" | sort
+    printf '%s\n' "${final_files[@]}" | LC_ALL=C sort
 }
 
 # Apply special mappings to files
@@ -284,7 +284,7 @@ generate_manifest() {
     # Process each component
     local components_json="{}"
     
-    for component in $(jq -r '.components | keys[]' "$SOURCE_MANIFEST" | sort); do
+    for component in $(jq -r '.components | keys[]' "$SOURCE_MANIFEST" | LC_ALL=C sort); do
         local component_json
         component_json=$(process_component "$component")
         components_json=$(echo "$components_json" | jq --arg key "$component" --argjson value "$component_json" '.[$key] = $value')
