@@ -444,12 +444,18 @@ process_snippet_injections() {
     
     print_info "Processing snippet injections..."
     
-    # Download snippet manager if not already present
-    local snippet_manager="$install_dir/.snippet-manager.sh"
+    # Download snippet manager to a temporary location
+    local temp_dir
+    temp_dir=$(mktemp -d)
+    local snippet_manager="$temp_dir/snippet-manager.sh"
+    
     if download_file "scripts/snippet-manager.sh" "$snippet_manager"; then
-        chmod +x "$snippet_manager"
+        if [[ "$DRY_RUN" == "false" ]]; then
+            chmod +x "$snippet_manager"
+        fi
     else
         print_warning "Could not download snippet manager, skipping injections"
+        rm -rf "$temp_dir"
         return 0
     fi
     
@@ -507,6 +513,9 @@ process_snippet_injections() {
     if [[ $snippets_processed -gt 0 ]]; then
         print_success "Processed $snippets_processed snippet injections"
     fi
+    
+    # Clean up temporary directory
+    rm -rf "$temp_dir"
 }
 
 # Main installation function
