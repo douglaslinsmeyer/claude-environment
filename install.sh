@@ -472,9 +472,12 @@ process_snippet_injections() {
             if [[ "$DRY_RUN" == "true" ]]; then
                 "$snippet_manager" inject "$snippet" "$settings_target" true
             else
-                "$snippet_manager" inject "$snippet" "$settings_target"
+                if ! "$snippet_manager" inject "$snippet" "$settings_target"; then
+                    print_warning "Failed to inject snippet: $snippet"
+                    continue
+                fi
             fi
-            ((snippets_processed++))
+            ((snippets_processed++)) || true
         done
     fi
     
@@ -492,9 +495,12 @@ process_snippet_injections() {
             if [[ "$DRY_RUN" == "true" ]]; then
                 "$snippet_manager" inject "$snippet" "$claude_target" true
             else
-                "$snippet_manager" inject "$snippet" "$claude_target"
+                if ! "$snippet_manager" inject "$snippet" "$claude_target"; then
+                    print_warning "Failed to inject snippet: $snippet"
+                    continue
+                fi
             fi
-            ((snippets_processed++))
+            ((snippets_processed++)) || true
         done
     fi
     
