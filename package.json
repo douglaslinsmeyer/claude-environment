@@ -1,0 +1,33 @@
+{
+  "name": "claude-environment",
+  "version": "2.3.0",
+  "private": true,
+  "description": "Claude Environment - Commands and personas for Claude AI",
+  "scripts": {
+    "test": "make test",
+    "lint": "make lint",
+    "validate": "make validate",
+    "semantic-release": "semantic-release",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.0.0",
+    "@commitlint/config-conventional": "^18.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^11.0.0",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.0.0",
+    "@semantic-release/release-notes-generator": "^12.0.0",
+    "conventional-changelog-conventionalcommits": "^7.0.0",
+    "husky": "^8.0.0",
+    "semantic-release": "^22.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/douglaslinsmeyer/claude-environment.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

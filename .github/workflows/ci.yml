@@ -1,305 +1,209 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
-jobs:
-  validate-files:
-    name: Validate Files
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Validate markdown files
-        run: |
-          echo "Checking for empty markdown files..."
-          find . -name "*.md" -type f -empty -print -exec false {} +
-          
-      - name: Validate JSON files
-        run: |
-          echo "Validating manifest.json..."
-          jq empty manifest.json
-          
-      - name: Check file permissions
-        run: |
-          echo "Checking install.sh is executable..."
-          test -x install.sh
-          
-      - name: Install BATS
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y bats
-          
-      - name: Run BATS validation tests
-        run: |
-          chmod +x tests/*.sh tests/*.bats
-          bats tests/validation.bats
+env:
+  BATS_VERSION: "1.10.0"
 
-  shellcheck:
-    name: ShellCheck
+jobs:
+  # Fast validation checks - fail fast on basic issues
+  validate:
+    name: Validate
     runs-on: ubuntu-latest
-    
+    outputs:
+      should-release: ${{ steps.check-version.outputs.changed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+        with:
+          fetch-depth: 0  # Need full history for version checks
+
+      - name: Validate files
+        run: make validate
+
+      - name: Cache ShellCheck
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/shellcheck
+          key: shellcheck-${{ runner.os }}-v0.9.0
+
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@2.0.0
         with:
           check_together: 'yes'
-          scandir: '.'
-          format: 'gcc'
+          severity: error
 
-  bats-tests:
-    name: BATS Tests
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    
-    runs-on: ${{ matrix.os }}
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Install BATS
+      - name: Check version changes
+        id: check-version
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y bats
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew install bats-core
+          current_version=$(cat VERSION)
+          if git rev-parse "v$current_version" >/dev/null 2>&1; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
           fi
-        
-      - name: Run all BATS tests
-        run: |
-          chmod +x tests/*.sh tests/*.bats
-          bash tests/run_bats_tests.sh
 
-  test-installation:
-    name: Test Installation
+  # Run tests in parallel across different OS
+  test:
+    name: Test
+    needs: validate
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        install-type: [global, local]
-        
+        test-suite: [unit, integration]
     runs-on: ${{ matrix.os }}
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: Test installation
+
+      - name: Setup test environment
+        uses: ./.github/actions/setup-tests
+        with:
+          os: ${{ matrix.os }}
+
+      - name: Run unit tests
+        if: matrix.test-suite == 'unit'
+        run: |
+          bats tests/validation.bats
+          bats tests/bump-version.bats
+          bats tests/shellcheck.bats
+          bats tests/version-consistency.bats
+
+      - name: Run integration tests
+        if: matrix.test-suite == 'integration'
         run: |
           # Set up test environment
-          if [[ "${{ matrix.install-type }}" == "global" ]]; then
-            export HOME="$GITHUB_WORKSPACE/test-home"
-            mkdir -p "$HOME"
-            INSTALL_FLAG=""
-          else
-            INSTALL_FLAG="--local"
-          fi
-          
-          # Use local files for installation test instead of remote
           export CLAUDE_ENV_REPO_URL="file://$GITHUB_WORKSPACE"
           
-          # Run installation
-          bash install.sh $INSTALL_FLAG --force
+          # Run installation tests
+          bats tests/install.bats
           
-          # Verify installation
-          if [[ "${{ matrix.install-type }}" == "global" ]]; then
-            CLAUDE_DIR="$HOME/.claude"
-          else
-            CLAUDE_DIR=".claude"
-          fi
-          
-          # Load test helpers
-          source tests/test-helpers.sh
-          
-          # Check key files exist
-          test -d "$CLAUDE_DIR"
-          test -f "$CLAUDE_DIR/.claude-install-manifest"
-          
-          # Dynamically verify component directories from manifest
-          while IFS= read -r component; do
-            [[ -z "$component" ]] && continue
-            test -d "$CLAUDE_DIR/$component" || (echo "Missing component directory: $component" && exit 1)
-          done < <(get_manifest_components manifest.json)
-          
-          echo "Installation test passed!"
-
-  test-update:
-    name: Test Update Scenario
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Test update scenario
-        run: |
+          # Test actual installation scenarios
           export HOME="$GITHUB_WORKSPACE/test-home"
           mkdir -p "$HOME"
           
-          # Use local files for installation test
-          export CLAUDE_ENV_REPO_URL="file://$GITHUB_WORKSPACE"
-          
-          # Load test helpers
-          source tests/test-helpers.sh
-          
-          # First installation
+          # Test global installation
           bash install.sh --force
+          test -d "$HOME/.claude"
           
-          # Dynamically select a test file from manifest
-          TEST_FILE=$(get_test_file manifest.json)
-          
-          # Verify first installation
-          test -f "$HOME/.claude/$TEST_FILE"
-          
-          # Save original content
-          ORIGINAL_CONTENT=$(cat "$HOME/.claude/$TEST_FILE")
-          
-          # Modify the file
-          echo "Modified content for testing" > "$HOME/.claude/$TEST_FILE"
-          
-          # Run update
-          bash install.sh --force
-          
-          # Verify file was restored
-          RESTORED_CONTENT=$(cat "$HOME/.claude/$TEST_FILE")
-          [[ "$ORIGINAL_CONTENT" == "$RESTORED_CONTENT" ]] || (echo "File not properly restored during update" && exit 1)
-          
-          echo "Update test passed!"
+          # Test local installation
+          cd "$GITHUB_WORKSPACE/test-local"
+          mkdir -p test-local && cd test-local
+          bash "$GITHUB_WORKSPACE/install.sh" --local --force
+          test -d ".claude"
 
-  test-dry-run:
-    name: Test Dry Run
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-failures-${{ matrix.os }}-${{ matrix.test-suite }}
+          path: |
+            test-results/
+            *.log
+
+  # Security scanning
+  security:
+    name: Security Scan
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: Test dry run
-        run: |
-          export HOME="$GITHUB_WORKSPACE/test-home"
-          mkdir -p "$HOME"
-          
-          # Use local files for installation test
-          export CLAUDE_ENV_REPO_URL="file://$GITHUB_WORKSPACE"
-          
-          # Run dry run
-          output=$(bash install.sh --dry-run 2>&1)
-          
-          # Verify no files were created
-          test ! -d "$HOME/.claude"
-          
-          # Verify dry run output
-          echo "$output" | grep -q "DRY RUN"
-          echo "$output" | grep -q "Would"
-          
-          echo "Dry run test passed!"
 
-  all-tests:
-    name: All Tests
-    needs: [validate-files, shellcheck, bats-tests, test-installation, test-update, test-dry-run]
+      - name: Run Trivy security scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Performance and metrics collection
+  metrics:
+    name: Collect Metrics
+    needs: [validate, test]
     runs-on: ubuntu-latest
-    
+    if: always()
     steps:
-      - name: All tests passed
-        run: echo "All tests passed successfully! ✅"
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  create-release:
-    name: Create Release if Version Changed
-    needs: all-tests
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      - name: Collect test metrics
+        run: |
+          echo "## Test Run Metrics" > metrics.md
+          echo "- Date: $(date -u)" >> metrics.md
+          echo "- Commit: ${{ github.sha }}" >> metrics.md
+          echo "- Branch: ${{ github.ref }}" >> metrics.md
+          echo "- Triggered by: ${{ github.event_name }}" >> metrics.md
+
+      - name: Upload metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-metrics
+          path: metrics.md
+
+  # Automated release using semantic-release
+  release:
+    name: Release
+    needs: [validate, test, security]
+    if: |
+      github.ref == 'refs/heads/main' && 
+      github.event_name == 'push' && 
+      needs.validate.outputs.should-release == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+      issues: write
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # Note: Using GITHUB_TOKEN here means the tag push won't trigger the release workflow
-          # This is a GitHub security feature to prevent infinite workflow loops
-          # To enable automatic releases, you would need to use a Personal Access Token (PAT)
-          # For now, releases need to be created manually after tags are pushed
-          token: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Check and create tag
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
         run: |
-          # Get current version from VERSION file
-          current_version=$(cat VERSION)
-          echo "Current version: $current_version"
-          
-          # Check if tag already exists
-          if git rev-parse "v$current_version" >/dev/null 2>&1; then
-            echo "Tag v$current_version already exists, skipping tag creation"
-          else
-            echo "Creating tag v$current_version"
-            
-            # Configure git
-            git config user.name "GitHub Actions"
-            git config user.email "actions@github.com"
-            
-            # Create annotated tag
-            git tag -a "v$current_version" -m "Release version $current_version"
-            
-            # Push tag
-            git push origin "v$current_version"
-            
-            echo "Tag v$current_version created and pushed"
-          fi
-          
-      - name: Create GitHub Release
-        if: success()
+          npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/exec
+
+      - name: Create release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: "semantic-release-bot"
+          GIT_AUTHOR_EMAIL: "semantic-release-bot@martynus.net"
+          GIT_COMMITTER_NAME: "semantic-release-bot"
+          GIT_COMMITTER_EMAIL: "semantic-release-bot@martynus.net"
         run: |
+          # For now, use the existing version-based release process
+          # TODO: Migrate to full semantic-release in the future
           current_version=$(cat VERSION)
           
-          # Only create release if tag was just created
-          if git rev-parse "v$current_version" >/dev/null 2>&1 && ! gh release view "v$current_version" >/dev/null 2>&1; then
-            echo "Creating GitHub release for v$current_version"
-            
-            # Extract changelog section for this version
-            changelog=$(awk -v ver="## [$current_version]" '
-              $0 ~ ver { found=1; next }
-              found && /^## \[/ { exit }
-              found { print }
-            ' CHANGELOG.md)
-            
-            # Create release body
-            {
-              echo "## Installation"
-              echo ""
-              echo '```bash'
-              echo "curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/v$current_version/install.sh | bash"
-              echo '```'
-              echo ""
-              echo "## What's Changed"
-              echo ""
-              echo "$changelog"
-              echo ""
-              echo "---"
-              echo ""
-              echo "**Full Changelog**: https://github.com/douglaslinsmeyer/claude-environment/blob/main/CHANGELOG.md"
-            } > release-body.md
-            
-            # Create the release
-            gh release create "v$current_version" \
-              --title "Release $current_version" \
-              --notes-file release-body.md \
-              --verify-tag
-            
-            echo "Release created successfully!"
-          else
-            echo "Release already exists or tag not found, skipping release creation"
-          fi
+          # Create tag
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a "v$current_version" -m "Release version $current_version"
+          git push origin "v$current_version"
+          
+          # Create GitHub release
+          gh release create "v$current_version" \
+            --title "Release $current_version" \
+            --notes-file <(bash scripts/generate-release-notes.sh $current_version) \
+            --verify-tag

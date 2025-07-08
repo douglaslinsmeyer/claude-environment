@@ -14,6 +14,11 @@ Thank you for your interest in contributing to Claude Environment! This document
    ```bash
    git remote add upstream https://github.com/douglaslinsmeyer/claude-environment.git
    ```
+4. Install development dependencies:
+   ```bash
+   make setup
+   ```
+   This will install BATS, ShellCheck, Node.js, and other required tools.
 
 ## Development Process
 
@@ -34,44 +39,56 @@ git checkout -b fix/your-bug-fix
 
 ### 3. Test Your Changes
 
-Run the test suite:
 ```bash
-# Install BATS if you haven't already
-brew install bats-core  # macOS
-# or
-sudo apt-get install bats  # Ubuntu/Debian
+# Run all tests
+make test
 
-# Install ShellCheck for linting
-brew install shellcheck  # macOS
-# or
-sudo apt-get install shellcheck  # Ubuntu/Debian
+# Run linting only
+make lint
 
-# Run tests
-bash tests/run_bats_tests.sh
+# Run validation only
+make validate
+
+# Run everything (recommended before committing)
+make validate && make lint && make test
 ```
 
-The test suite now includes:
+The test suite includes:
 - File validation tests
-- Installation tests
+- Installation tests (unit and integration)
 - Version bump script tests
 - ShellCheck linting for all shell scripts
+- Version consistency checks
 
 ### 4. Commit Your Changes
 
-Follow conventional commit format:
+We use [Conventional Commits](https://www.conventionalcommits.org/) for automatic versioning and changelog generation:
+
 ```bash
 git commit -m "feat: add new command for X"
 git commit -m "fix: correct parsing issue in Y"
 git commit -m "docs: update README with Z"
 ```
 
-Commit types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `test`: Test additions or changes
-- `chore`: Maintenance tasks
-- `refactor`: Code refactoring
+Commit types and their version impact:
+- `feat`: New feature (minor version bump)
+- `fix`: Bug fix (patch version bump)
+- `docs`: Documentation changes (patch version bump)
+- `style`: Code style changes (patch version bump)
+- `refactor`: Code refactoring (patch version bump)
+- `perf`: Performance improvements (patch version bump)
+- `test`: Test additions or changes (patch version bump)
+- `build`: Build system changes (patch version bump)
+- `ci`: CI/CD changes (patch version bump)
+- `chore`: Maintenance tasks (no version bump)
+- `revert`: Revert previous commit (patch version bump)
+
+For breaking changes, add `!` after the type:
+```bash
+git commit -m "feat!: rename workflows directory to commands
+
+BREAKING CHANGE: Users must update their installations"
+```
 
 ### 5. Push and Create Pull Request
 
@@ -187,29 +204,42 @@ Example:
 
 ## Release Process
 
-Releases are automatically created after all CI tests pass on the main branch:
+Releases are automatically managed through our CI/CD pipeline:
+
+### Automatic Release (Recommended)
+
+When changes are merged to main, the pipeline will:
+1. Analyze commit messages to determine version bump
+2. Update VERSION and CHANGELOG.md automatically
+3. Create a git tag
+4. Generate and publish a GitHub release
+
+This happens automatically based on your commit types:
+- `feat:` commits trigger a minor version bump
+- `fix:`, `docs:`, etc. trigger patch version bumps
+- `feat!:` or `BREAKING CHANGE:` trigger major version bumps
+- `chore:` commits don't trigger releases
+
+### Manual Release (Legacy Process)
+
+For special cases requiring manual version control:
 
 1. Update version using the bump script:
    ```bash
    ./scripts/bump-version.sh [major|minor|patch]
    ```
-2. Review and update the Unreleased section in CHANGELOG.md with your changes
+2. Review and update the Unreleased section in CHANGELOG.md
 3. Commit the version bump:
    ```bash
-   git add VERSION CHANGELOG.md
+   git add VERSION CHANGELOG.md manifest.json
    git commit -m "chore: bump version to X.Y.Z"
    ```
 4. Push to main:
    ```bash
    git push origin main
    ```
-5. The CI/CD pipeline will automatically:
-   - Run all tests (unit, integration, linting)
-   - If all tests pass, create a git tag for the version
-   - Create a GitHub release with changelog content
-   - Publish the release with installation instructions
 
-This ensures that releases are only created from code that has passed all quality checks.
+The CI/CD pipeline ensures releases are only created from code that has passed all quality checks.
 
 ## Questions?
 

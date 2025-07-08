@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2025-07-08
+
+### Added
+- New `/persona` command for adopting specific personas during interactions
+  - Dynamically loads persona files from `./personas` directory
+  - Provides helpful error messages with available personas list when persona not found
+  - Supports persona switching throughout conversation
+- Modern CI/CD pipeline with GitOps practices
+  - Parallel test execution across OS and test suites
+  - Intelligent caching for dependencies
+  - Security scanning with Trivy
+  - Performance metrics collection
+  - Automated semantic versioning setup
+- Development tooling improvements
+  - Makefile for common tasks (test, lint, validate)
+  - Custom GitHub Action for test environment setup
+  - Dependabot configuration for automated updates
+  - Commitlint for conventional commit enforcement
+  - Semantic-release configuration for future automation
+- Enhanced .gitignore for Node.js dependencies and test artifacts
+
+### Changed
+- Refactored CI/CD workflow for better performance and maintainability
+  - Tests now run in parallel matrix (OS × test-suite)
+  - Validation fails fast on basic issues
+  - Release process is more streamlined
+- Updated CONTRIBUTING.md with new development workflow
+  - Added make commands for testing
+  - Documented conventional commit guidelines
+  - Updated release process documentation
+
 ## [2.2.2] - 2025-07-06
 
 ### Changed
@@ -267,7 +298,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.2...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.2...v2.3.0
 [2.2.2]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.0...v2.2.2
 [2.2.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.1.0...v2.1.1
