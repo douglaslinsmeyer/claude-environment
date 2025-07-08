@@ -26,6 +26,20 @@ jobs:
       - name: Validate files
         run: make validate
 
+      - name: Validate manifest.json
+        run: |
+          # Generate manifest from source
+          ./scripts/generate-manifest.sh
+          
+          # Check if manifest.json is up-to-date
+          if git diff --exit-code manifest.json; then
+            echo "✓ manifest.json is up-to-date"
+          else
+            echo "❌ manifest.json is out of sync with manifest-source.json"
+            echo "Run './scripts/generate-manifest.sh' and commit the changes"
+            exit 1
+          fi
+
       - name: Cache ShellCheck
         uses: actions/cache@v4
         with:

@@ -1,9 +1,16 @@
 {
-  "version": "2.3.0",
+  "_generated": {
+    "source": "manifest-source.json",
+    "source_hash": "fb23adcb23ef3b3a95379be6df4402626a4f6c37c723ef9662a21cb08abbc618",
+    "timestamp": "2025-07-08T20:42:18Z"
+  },
   "components": {
     "commands": {
       "description": "Claude command files for various tasks",
       "files": [
+        "commands/analysis/explore-data.md",
+        "commands/analysis/research-summary.md",
+        "commands/analysis/trend-analysis.md",
         "commands/coding/code-review.md",
         "commands/coding/debug.md",
         "commands/coding/generate-readme.md",
@@ -12,22 +19,19 @@
         "commands/writing/blog-post.md",
         "commands/writing/documentation.md",
         "commands/writing/email-draft.md",
-        "commands/writing/technical-article.md",
-        "commands/analysis/explore-data.md",
-        "commands/analysis/research-summary.md",
-        "commands/analysis/trend-analysis.md"
+        "commands/writing/technical-article.md"
       ]
     },
     "personas": {
-      "description": "Claude persona configurations", 
+      "description": "Claude persona configurations",
       "files": [
-        "personas/senior-developer.md",
-        "personas/technical-writer.md",
+        "personas/cli-developer.md",
         "personas/data-analyst.md",
         "personas/product-manager.md",
         "personas/researcher.md",
+        "personas/senior-developer.md",
         "personas/senior-devops-engineer.md",
-        "personas/cli-developer.md"
+        "personas/technical-writer.md"
       ]
     },
     "templates": {
@@ -36,5 +40,6 @@
         "templates/README-template.md"
       ]
     }
-  }
+  },
+  "version": "2.4.0"
 }

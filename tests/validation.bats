@@ -208,6 +208,6 @@ except jsonschema.ValidationError as e:
 
 @test "Release functionality exists in CI workflow" {
     # Release workflow was consolidated into CI workflow
-    grep -q "create-release:" "$PROJECT_ROOT/.github/workflows/ci.yml"
-    grep -q "Create GitHub Release" "$PROJECT_ROOT/.github/workflows/ci.yml"
+    grep -q "release:" "$PROJECT_ROOT/.github/workflows/ci.yml"
+    grep -q "Create release" "$PROJECT_ROOT/.github/workflows/ci.yml"
 }

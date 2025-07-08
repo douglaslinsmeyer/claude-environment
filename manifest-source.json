@@ -1,0 +1,30 @@
+{
+  "components": {
+    "commands": {
+      "description": "Claude command files for various tasks",
+      "files": [
+        "./commands/coding/*.md",
+        "./commands/writing/*.md",
+        "./commands/analysis/*.md",
+        "!./commands/**/README.md",
+        "!./commands/**/*.draft.md"
+      ],
+      "special_mappings": {}
+    },
+    "personas": {
+      "description": "Claude persona configurations", 
+      "files": [
+        "./personas/*.md",
+        "!./personas/example-*.md"
+      ],
+      "special_mappings": {}
+    },
+    "templates": {
+      "description": "Project and documentation templates",
+      "files": [
+        "./templates/*.md"
+      ],
+      "special_mappings": {}
+    }
+  }
+}

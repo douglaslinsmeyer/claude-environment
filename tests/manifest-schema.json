@@ -10,6 +10,23 @@
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
       "description": "Semantic version of the claude-environment"
     },
+    "_generated": {
+      "type": "object",
+      "description": "Metadata about manifest generation",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string"
+        },
+        "source_hash": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
     "components": {
       "type": "object",
       "description": "Available components for installation",

@@ -161,24 +161,45 @@ Include:
 
 ## Adding New Components
 
+### Manifest System
+
+The project uses an automated manifest generation system:
+- `manifest-source.json` defines file patterns using globs
+- `manifest.json` is auto-generated from the source
+- The CI/CD pipeline validates manifest.json is up-to-date
+
 ### New Commands
 1. Add the command file to appropriate subdirectory in `commands/`
-2. Update `manifest.json` with the new file
-3. Update the file list in `install.sh`
-4. Add tests for the new command
-5. Document in README if significant
+2. Run `./scripts/generate-manifest.sh` to update manifest.json
+3. Add tests for the new command
+4. Document in README if significant
 
 ### New Personas
 1. Add the persona file to `personas/`
-2. Update `manifest.json`
-3. Update the file list in `install.sh`
-4. Follow the existing persona structure
+2. Run `./scripts/generate-manifest.sh` to update manifest.json
+3. Follow the existing persona structure
 
 ### New Templates
 1. Add the template to appropriate directory
-2. Update `manifest.json`
-3. Update the file list in `install.sh`
-4. Include usage instructions
+2. Run `./scripts/generate-manifest.sh` to update manifest.json
+3. Include usage instructions
+
+### Manifest Features
+
+The manifest system supports:
+- **Glob patterns**: Use `./commands/**/*.md` to match all .md files
+- **Exclusions**: Use `!pattern` to exclude files (e.g., `!**/*.draft.md`)
+- **Special mappings**: Remap file paths during installation:
+  ```json
+  "special_mappings": {
+    "source/path/file.md": "target/path/file.md"
+  }
+  ```
+
+### Important Notes
+- Never manually edit `manifest.json` - always use the generator
+- The CI/CD will fail if manifest.json is out of sync
+- File patterns are resolved relative to the project root
 
 ## Changelog Updates
 
