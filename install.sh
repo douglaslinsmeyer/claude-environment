@@ -460,6 +460,12 @@ process_snippet_injections() {
     
     # Process settings snippets
     if [[ -d "$install_dir/snippets/settings" ]]; then
+        # Create settings.json if it doesn't exist
+        if [[ ! -f "$settings_target" ]] && [[ "$DRY_RUN" == "false" ]]; then
+            echo '{}' > "$settings_target"
+            print_info "Created empty settings.json"
+        fi
+        
         for snippet in "$install_dir/snippets/settings"/*.json; do
             [[ -f "$snippet" ]] || continue
             
@@ -472,8 +478,14 @@ process_snippet_injections() {
         done
     fi
     
-    # Process CLAUDE.md snippets  
+    # Process CLAUDE.md snippets
     if [[ -d "$install_dir/snippets/claude-md" ]]; then
+        # Create CLAUDE.md if it doesn't exist
+        if [[ ! -f "$claude_target" ]] && [[ "$DRY_RUN" == "false" ]]; then
+            touch "$claude_target"
+            print_info "Created empty CLAUDE.md"
+        fi
+        
         for snippet in "$install_dir/snippets/claude-md"/*.md; do
             [[ -f "$snippet" ]] || continue
             
