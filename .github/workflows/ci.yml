@@ -28,14 +28,27 @@ jobs:
 
       - name: Validate manifest.json
         run: |
+          # Save current manifest
+          cp manifest.json manifest.json.orig
+          
           # Generate manifest from source
           ./scripts/generate-manifest.sh
           
-          # Check if manifest.json is up-to-date
-          if git diff --exit-code manifest.json; then
+          # Compare manifests excluding timestamp
+          # Remove timestamp lines before comparison
+          sed '/"timestamp":/d' manifest.json.orig > manifest.orig.no-timestamp
+          sed '/"timestamp":/d' manifest.json > manifest.new.no-timestamp
+          
+          # Check if files are identical (excluding timestamp)
+          if diff manifest.orig.no-timestamp manifest.new.no-timestamp > /dev/null; then
             echo "✓ manifest.json is up-to-date"
+            # Restore original to avoid timestamp-only changes
+            mv manifest.json.orig manifest.json
           else
             echo "❌ manifest.json is out of sync with manifest-source.json"
+            echo "Differences found:"
+            diff manifest.orig.no-timestamp manifest.new.no-timestamp || true
+            echo ""
             echo "Run './scripts/generate-manifest.sh' and commit the changes"
             exit 1
           fi
