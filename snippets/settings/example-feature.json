@@ -1,0 +1,17 @@
+{
+  "snippet_id": "example-feature",
+  "snippet_version": "1.0.0",
+  "description": "Example feature configuration",
+  "settings": {
+    "example": {
+      "enabled": true,
+      "configuration": {
+        "option1": "value1",
+        "option2": 42,
+        "nestedOptions": {
+          "subOption": "subValue"
+        }
+      }
+    }
+  }
+}

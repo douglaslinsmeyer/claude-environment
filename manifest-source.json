@@ -25,6 +25,15 @@
         "./templates/*.md"
       ],
       "special_mappings": {}
+    },
+    "snippets": {
+      "description": "Configuration snippets for settings.json and CLAUDE.md",
+      "files": [
+        "./snippets/settings/*.json",
+        "./snippets/claude-md/*.md",
+        "./snippets/README.md"
+      ],
+      "special_mappings": {}
     }
   }
 }

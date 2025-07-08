@@ -13,6 +13,8 @@ INSTALL_TYPE="global"
 INSTALL_COMMANDS=true
 INSTALL_PERSONAS=true
 INSTALL_TEMPLATES=true
+INSTALL_SNIPPETS=true
+INJECT_SNIPPETS=true
 FORCE=false
 DRY_RUN=false
 MANIFEST_FILE=".claude-install-manifest"
@@ -44,6 +46,8 @@ OPTIONS:
     --no-commands     Skip command files
     --no-personas     Skip persona files
     --no-templates    Skip template files
+    --no-snippets     Skip snippet files
+    --no-inject       Skip snippet injection into settings.json and CLAUDE.md
     --force           Skip confirmation prompts
     --dry-run         Show what would be installed without doing it
     --version         Show version info
@@ -83,6 +87,14 @@ parse_args() {
                 ;;
             --no-templates)
                 INSTALL_TEMPLATES=false
+                shift
+                ;;
+            --no-snippets)
+                INSTALL_SNIPPETS=false
+                shift
+                ;;
+            --no-inject)
+                INJECT_SNIPPETS=false
                 shift
                 ;;
             --force)
@@ -333,6 +345,9 @@ install_component() {
         "templates")
             [[ "$INSTALL_TEMPLATES" == "false" ]] && return 0
             ;;
+        "snippets")
+            [[ "$INSTALL_SNIPPETS" == "false" ]] && return 0
+            ;;
     esac
 
     # Get list of files for this component
@@ -404,6 +419,7 @@ create_manifest() {
     [[ "$INSTALL_COMMANDS" == "true" ]] && components+=("commands")
     [[ "$INSTALL_PERSONAS" == "true" ]] && components+=("personas")
     [[ "$INSTALL_TEMPLATES" == "true" ]] && components+=("templates")
+    [[ "$INSTALL_SNIPPETS" == "true" ]] && components+=("snippets")
 
     # Create manifest with file list
     cat > "$manifest_path" << EOF
@@ -415,6 +431,64 @@ create_manifest() {
   "files": [$(printf '"%s",' "${INSTALLED_FILES[@]}" | sed 's/,$//')]
 }
 EOF
+}
+
+# Process snippet injections
+process_snippet_injections() {
+    local install_dir="$1"
+    local remote_version="$2"
+    
+    if [[ "$INJECT_SNIPPETS" == "false" ]]; then
+        return 0
+    fi
+    
+    print_info "Processing snippet injections..."
+    
+    # Download snippet manager if not already present
+    local snippet_manager="$install_dir/.snippet-manager.sh"
+    if download_file "scripts/snippet-manager.sh" "$snippet_manager"; then
+        chmod +x "$snippet_manager"
+    else
+        print_warning "Could not download snippet manager, skipping injections"
+        return 0
+    fi
+    
+    # Find all downloaded snippet files
+    local snippets_processed=0
+    local settings_target="$install_dir/settings.json"
+    local claude_target="$install_dir/CLAUDE.md"
+    
+    # Process settings snippets
+    if [[ -d "$install_dir/snippets/settings" ]]; then
+        for snippet in "$install_dir/snippets/settings"/*.json; do
+            [[ -f "$snippet" ]] || continue
+            
+            if [[ "$DRY_RUN" == "true" ]]; then
+                "$snippet_manager" inject "$snippet" "$settings_target" true
+            else
+                "$snippet_manager" inject "$snippet" "$settings_target"
+            fi
+            ((snippets_processed++))
+        done
+    fi
+    
+    # Process CLAUDE.md snippets  
+    if [[ -d "$install_dir/snippets/claude-md" ]]; then
+        for snippet in "$install_dir/snippets/claude-md"/*.md; do
+            [[ -f "$snippet" ]] || continue
+            
+            if [[ "$DRY_RUN" == "true" ]]; then
+                "$snippet_manager" inject "$snippet" "$claude_target" true
+            else
+                "$snippet_manager" inject "$snippet" "$claude_target"
+            fi
+            ((snippets_processed++))
+        done
+    fi
+    
+    if [[ $snippets_processed -gt 0 ]]; then
+        print_success "Processed $snippets_processed snippet injections"
+    fi
 }
 
 # Main installation function
@@ -464,13 +538,16 @@ main() {
     # Install components
     local total_files=0
     COMPONENT_FILE_COUNT=0
-    for component in "commands" "personas" "templates"; do
+    for component in "commands" "personas" "templates" "snippets"; do
         install_component "$component" "$install_dir"
         ((total_files += COMPONENT_FILE_COUNT))
     done
 
     # Create manifest
     create_manifest "$install_dir" "$remote_version"
+    
+    # Process snippet injections
+    process_snippet_injections "$install_dir" "$remote_version"
 
     if [[ "$DRY_RUN" == "true" ]]; then
         print_info "Dry run complete. Would install $total_files files."

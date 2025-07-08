@@ -1,8 +1,8 @@
 {
   "_generated": {
     "source": "manifest-source.json",
-    "source_hash": "fb23adcb23ef3b3a95379be6df4402626a4f6c37c723ef9662a21cb08abbc618",
-    "timestamp": "2025-07-08T20:42:18Z"
+    "source_hash": "e2f61088331b17c255c8308775d8acd7ce18fbde9f8c7efbe4f5b56cb4b5cceb",
+    "timestamp": "2025-07-08T21:13:32Z"
   },
   "components": {
     "commands": {
@@ -34,6 +34,14 @@
         "personas/technical-writer.md"
       ]
     },
+    "snippets": {
+      "description": "Configuration snippets for settings.json and CLAUDE.md",
+      "files": [
+        "snippets/claude-md/development-standards.md",
+        "snippets/README.md",
+        "snippets/settings/example-feature.json"
+      ]
+    },
     "templates": {
       "description": "Project and documentation templates",
       "files": [
@@ -41,5 +49,5 @@
       ]
     }
   },
-  "version": "2.4.0"
+  "version": "2.5.0"
 }

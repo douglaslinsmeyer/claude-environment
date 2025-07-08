@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2025-07-08
+
+### Added
+- Snippet injection system for configuration management
+  - New `snippets/` directory structure for storing configuration snippets
+  - Support for injecting snippets into `settings.json` files
+  - Support for injecting snippets into `CLAUDE.md` files
+  - `snippet-manager.sh` script for managing snippet injection and removal
+  - Snippet manifest tracking for installed snippets
+  - Automatic backup creation before modifications
+  - Support for updating existing snippets
+  - `--no-snippets` flag to skip snippet installation
+  - `--no-inject` flag to skip snippet injection
+  - Example snippets for both settings.json and CLAUDE.md
+  - Comprehensive test suite for snippet functionality
+
+### Changed
+- Updated installer to support snippet component
+- Added snippet processing after main installation
+
 ## [2.4.0] - 2025-07-08
 
 ### Added
