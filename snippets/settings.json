@@ -1,0 +1,14 @@
+{
+  "claude-environment": {
+    "version": "2.5.0",
+    "description": "Settings managed by claude-environment",
+    "features": {
+      "auto-update-check": false,
+      "snippet-injection": true
+    },
+    "defaults": {
+      "file-naming": "kebab-case",
+      "indentation": "spaces-2"
+    }
+  }
+}

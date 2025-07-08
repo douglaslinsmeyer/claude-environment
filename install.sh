@@ -17,7 +17,7 @@ INSTALL_SNIPPETS=true
 INJECT_SNIPPETS=true
 FORCE=false
 DRY_RUN=false
-MANIFEST_FILE=".claude-install-manifest"
+MANIFEST_FILE=".claude-environment-manifest.json"
 
 # Colors for output
 RED='\033[0;31m'
@@ -162,7 +162,11 @@ show_version() {
     install_dir=$(get_install_dir)
     if [[ -f "$install_dir/$MANIFEST_FILE" ]]; then
         local installed_version
-        installed_version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$install_dir/$MANIFEST_FILE" | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+        if command -v jq >/dev/null 2>&1; then
+            installed_version=$(jq -r '.installation.version // empty' "$install_dir/$MANIFEST_FILE" 2>/dev/null || echo "unknown")
+        else
+            installed_version=$(grep -A5 '"installation"' "$install_dir/$MANIFEST_FILE" | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' 2>/dev/null || echo "unknown")
+        fi
         echo "Installed version: $installed_version" >&2
     else
         echo "Not currently installed" >&2
@@ -177,7 +181,13 @@ check_existing_installation() {
 
     if [[ -f "$manifest_path" ]]; then
         local installed_version
-        installed_version=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$manifest_path" | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' 2>/dev/null || echo "unknown")
+        # Extract version from installation.version in new structure
+        if command -v jq >/dev/null 2>&1; then
+            installed_version=$(jq -r '.installation.version // empty' "$manifest_path" 2>/dev/null || echo "unknown")
+        else
+            # Fallback grep for installation.version
+            installed_version=$(grep -A5 '"installation"' "$manifest_path" | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' 2>/dev/null || echo "unknown")
+        fi
         echo "$installed_version"
     else
         echo ""
@@ -237,8 +247,8 @@ remove_old_files() {
 
     # Extract file list from manifest and remove files
     if command -v jq >/dev/null 2>&1; then
-        # Use jq if available
-        jq -r '.files[]?' "$manifest_path" 2>/dev/null | while read -r file; do
+        # Use jq if available - now reading from installation.files
+        jq -r '.installation.files[]?' "$manifest_path" 2>/dev/null | while read -r file; do
             if [[ -n "$file" && -f "$install_dir/$file" ]]; then
                 if [[ "$DRY_RUN" == "true" ]]; then
                     print_info "Would remove: $install_dir/$file"
@@ -248,8 +258,8 @@ remove_old_files() {
             fi
         done
     else
-        # Fallback without jq (basic parsing)
-        grep -o '"[^"]*\.md"' "$manifest_path" 2>/dev/null | sed 's/"//g' | while read -r file; do
+        # Fallback without jq - find files array in installation section
+        sed -n '/installation.*{/,/^[[:space:]]*}/p' "$manifest_path" | grep -o '"[^"]*\.\(md\|json\)"' | sed 's/"//g' | while read -r file; do
             if [[ -f "$install_dir/$file" ]]; then
                 if [[ "$DRY_RUN" == "true" ]]; then
                     print_info "Would remove: $install_dir/$file"
@@ -421,16 +431,28 @@ create_manifest() {
     [[ "$INSTALL_TEMPLATES" == "true" ]] && components+=("templates")
     [[ "$INSTALL_SNIPPETS" == "true" ]] && components+=("snippets")
 
-    # Create manifest with file list
-    cat > "$manifest_path" << EOF
+    # Create manifest with new structure
+    cat > "$manifest_path.tmp" << EOF
 {
-  "version": "$version",
-  "installed_at": "$timestamp",
-  "install_type": "$INSTALL_TYPE",
-  "components": [$(printf '"%s",' "${components[@]}" | sed 's/,$//')],
-  "files": [$(printf '"%s",' "${INSTALLED_FILES[@]}" | sed 's/,$//')]
+  "_meta": {
+    "manifest_version": "1.0",
+    "generated_at": "$timestamp"
+  },
+  "installation": {
+    "version": "$version",
+    "installed_at": "$timestamp",
+    "install_type": "$INSTALL_TYPE",
+    "components": [$(printf '"%s",' "${components[@]}" | sed 's/,$//')],
+    "files": [$(printf '"%s",' "${INSTALLED_FILES[@]}" | sed 's/,$//')]
+  },
+  "snippets": {
+    "injected": {}
+  }
 }
 EOF
+    
+    # Atomic move
+    mv "$manifest_path.tmp" "$manifest_path"
 }
 
 # Process snippet injections
@@ -464,50 +486,30 @@ process_snippet_injections() {
     local settings_target="$install_dir/settings.json"
     local claude_target="$install_dir/CLAUDE.md"
     
-    # Process settings snippets
-    if [[ -d "$install_dir/snippets/settings" ]]; then
-        # Create settings.json if it doesn't exist
-        if [[ ! -f "$settings_target" ]] && [[ "$DRY_RUN" == "false" ]]; then
-            echo '{}' > "$settings_target"
-            print_info "Created empty settings.json"
-        fi
-        
-        for snippet in "$install_dir/snippets/settings"/*.json; do
-            [[ -f "$snippet" ]] || continue
-            
-            if [[ "$DRY_RUN" == "true" ]]; then
-                "$snippet_manager" inject "$snippet" "$settings_target" true
+    # Process settings.json snippet
+    if [[ -f "$install_dir/snippets/settings.json" ]]; then
+        if [[ "$DRY_RUN" == "true" ]]; then
+            "$snippet_manager" inject "$install_dir/snippets/settings.json" "$settings_target" true
+        else
+            if ! "$snippet_manager" inject "$install_dir/snippets/settings.json" "$settings_target"; then
+                print_warning "Failed to inject settings.json snippet"
             else
-                if ! "$snippet_manager" inject "$snippet" "$settings_target"; then
-                    print_warning "Failed to inject snippet: $snippet"
-                    continue
-                fi
+                ((snippets_processed++)) || true
             fi
-            ((snippets_processed++)) || true
-        done
+        fi
     fi
     
-    # Process CLAUDE.md snippets
-    if [[ -d "$install_dir/snippets/claude-md" ]]; then
-        # Create CLAUDE.md if it doesn't exist
-        if [[ ! -f "$claude_target" ]] && [[ "$DRY_RUN" == "false" ]]; then
-            touch "$claude_target"
-            print_info "Created empty CLAUDE.md"
-        fi
-        
-        for snippet in "$install_dir/snippets/claude-md"/*.md; do
-            [[ -f "$snippet" ]] || continue
-            
-            if [[ "$DRY_RUN" == "true" ]]; then
-                "$snippet_manager" inject "$snippet" "$claude_target" true
+    # Process CLAUDE.md snippet
+    if [[ -f "$install_dir/snippets/CLAUDE.md" ]]; then
+        if [[ "$DRY_RUN" == "true" ]]; then
+            "$snippet_manager" inject "$install_dir/snippets/CLAUDE.md" "$claude_target" true
+        else
+            if ! "$snippet_manager" inject "$install_dir/snippets/CLAUDE.md" "$claude_target"; then
+                print_warning "Failed to inject CLAUDE.md snippet"
             else
-                if ! "$snippet_manager" inject "$snippet" "$claude_target"; then
-                    print_warning "Failed to inject snippet: $snippet"
-                    continue
-                fi
+                ((snippets_processed++)) || true
             fi
-            ((snippets_processed++)) || true
-        done
+        fi
     fi
     
     if [[ $snippets_processed -gt 0 ]]; then

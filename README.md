@@ -26,8 +26,10 @@ The installer creates a `.claude` directory with the following structure:
 │   └── analysis/         # Data analysis and research commands
 ├── personas/             # Role-based Claude configurations
 ├── templates/            # Project templates and boilerplates
-├── CLAUDE.md            # Main Claude configuration file
-└── .claude-install-manifest  # Installation tracking
+├── snippets/             # Configuration snippets for injection
+├── CLAUDE.md            # Main Claude configuration file (if injected)
+├── settings.json        # Claude settings (if injected)
+└── .claude-environment-manifest.json  # Installation and snippet tracking
 ```
 
 ## Installation Options
@@ -40,6 +42,8 @@ The installer creates a `.claude` directory with the following structure:
 - `--no-commands` - Skip command files
 - `--no-personas` - Skip persona files
 - `--no-templates` - Skip template files
+- `--no-snippets` - Skip snippet files
+- `--no-inject` - Skip snippet injection into settings.json and CLAUDE.md
 
 ### Other Options
 - `--force` - Skip confirmation prompts
@@ -87,6 +91,43 @@ For project-specific configurations:
 cd ~/my-project
 curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/main/install.sh | bash -s -- --local
 # Creates ./my-project/.claude with all your configurations
+```
+
+## Configuration Snippets
+
+The installer can automatically inject configuration snippets into your Claude settings files:
+
+### Settings Snippet
+Adds default Claude environment settings to your `settings.json`:
+```json
+{
+  "claude-environment": {
+    "version": "2.5.0",
+    "features": {
+      "auto-update-check": false,
+      "snippet-injection": true
+    },
+    "defaults": {
+      "file-naming": "kebab-case",
+      "indentation": "spaces-2"
+    }
+  }
+}
+```
+
+### CLAUDE.md Snippet
+Appends development standards to your `CLAUDE.md` file:
+- Development best practices
+- Code quality requirements
+- Git workflow guidelines
+
+### Managing Snippets
+```bash
+# Install without snippet injection
+curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/main/install.sh | bash -s -- --no-inject
+
+# Install without downloading snippets at all
+curl -sSL https://raw.githubusercontent.com/douglaslinsmeyer/claude-environment/main/install.sh | bash -s -- --no-snippets
 ```
 
 ## Using Slash Commands
@@ -290,7 +331,11 @@ claude-config/
 │   └── project-templates/
 │       ├── web-dev-CLAUDE.md
 │       └── data-science-CLAUDE.md
-└── templates/            # Project templates
+├── templates/            # Project templates
+│   └── README-template.md
+└── snippets/             # Configuration snippets
+    ├── settings.json     # Settings snippet
+    └── CLAUDE.md        # CLAUDE.md snippet
     ├── README-template.md
     ├── CLAUDE-template.md
     └── project-setup.md
@@ -358,7 +403,9 @@ The system tracks installed versions and automatically handles updates:
 - **Fresh Install**: Installs all components to chosen location
 - **Update Detection**: Compares local vs remote versions
 - **Clean Updates**: Removes old files before installing new ones
-- **Conflict Handling**: Prompts before overwriting existing files
+- **Snippet Injection**: Automatically merges configuration snippets
+- **Manifest Tracking**: Single `.claude-environment-manifest.json` tracks all installed components and injected snippets
+- **Backup Creation**: Automatic backups before modifying existing files
 
 ## Platform Support
 

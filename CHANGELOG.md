@@ -15,17 +15,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Support for injecting snippets into `settings.json` files
   - Support for injecting snippets into `CLAUDE.md` files
   - `snippet-manager.sh` script for managing snippet injection and removal
-  - Snippet manifest tracking for installed snippets
   - Automatic backup creation before modifications
   - Support for updating existing snippets
   - `--no-snippets` flag to skip snippet installation
   - `--no-inject` flag to skip snippet injection
-  - Example snippets for both settings.json and CLAUDE.md
+  - Default snippets for both settings.json and CLAUDE.md
   - Comprehensive test suite for snippet functionality
 
 ### Changed
 - Updated installer to support snippet component
 - Added snippet processing after main installation
+- Consolidated manifests into single `.claude-environment-manifest.json` file
+  - Merged `.claude-install-manifest` and `.snippet-manifest.json`
+  - New structure with `_meta`, `installation`, and `snippets` sections
+  - Manifest is completely recreated on updates (no state migration)
+- Simplified snippet structure to one snippet per target file
+  - Moved from `snippets/settings/*.json` to `snippets/settings.json`
+  - Moved from `snippets/claude-md/*.md` to `snippets/CLAUDE.md`
+  - Eliminates potential conflicts from multiple snippets per file
 
 ## [2.4.0] - 2025-07-08
 

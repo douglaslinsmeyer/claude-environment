@@ -93,7 +93,7 @@ teardown() {
     local test_dir="$TEST_DIR/.claude"
     mkdir -p "$test_dir"
 
-    cat > "$test_dir/.claude-install-manifest" << EOF
+    cat > "$test_dir/.claude-environment-manifest.json" << EOF
 {
   "version": "1.0.0",
   "installed_at": "2024-01-01T00:00:00Z"
@@ -151,14 +151,14 @@ EOF
 
     create_manifest "$test_dir" "1.0.0"
 
-    [[ -f "$test_dir/.claude-install-manifest" ]]
+    [[ -f "$test_dir/.claude-environment-manifest.json" ]]
 
     # Verify JSON structure if jq is available
     if command -v jq >/dev/null 2>&1; then
-        version=$(jq -r '.version' "$test_dir/.claude-install-manifest")
+        version=$(jq -r '.version' "$test_dir/.claude-environment-manifest.json")
         [[ "$version" == "1.0.0" ]]
 
-        install_type=$(jq -r '.install_type' "$test_dir/.claude-install-manifest")
+        install_type=$(jq -r '.install_type' "$test_dir/.claude-environment-manifest.json")
         [[ "$install_type" == "local" ]]
     fi
 }
@@ -173,7 +173,7 @@ EOF
     echo "test" > "$test_dir/CLAUDE.md"
 
     # Create manifest
-    cat > "$test_dir/.claude-install-manifest" << EOF
+    cat > "$test_dir/.claude-environment-manifest.json" << EOF
 {
   "version": "0.9.0",
   "files": ["commands/test.md", "CLAUDE.md"]
@@ -184,7 +184,7 @@ EOF
 
     [[ ! -f "$test_dir/commands/test.md" ]]
     [[ ! -f "$test_dir/CLAUDE.md" ]]
-    [[ -f "$test_dir/.claude-install-manifest" ]]
+    [[ -f "$test_dir/.claude-environment-manifest.json" ]]
 }
 
 # Integration Tests
@@ -206,7 +206,7 @@ EOF
 
     # Test that create_manifest respects dry run
     create_manifest "$TEST_DIR" "1.0.0"
-    [[ ! -f "$TEST_DIR/.claude-install-manifest" ]]
+    [[ ! -f "$TEST_DIR/.claude-environment-manifest.json" ]]
 }
 
 @test "help flag shows usage" {
@@ -588,10 +588,22 @@ EOF
     mkdir -p "$test_dir"
     
     # Create a simple manifest
-    cat > "$test_dir/.claude-install-manifest" << 'EOF'
+    cat > "$test_dir/.claude-environment-manifest.json" << 'EOF'
 {
-  "version": "1.0.0",
-  "files": ["test1.md", "test2.md"]
+  "_meta": {
+    "manifest_version": "1.0",
+    "generated_at": "2024-01-01T00:00:00Z"
+  },
+  "installation": {
+    "version": "1.0.0",
+    "installed_at": "2024-01-01T00:00:00Z",
+    "install_type": "global",
+    "components": [],
+    "files": ["test1.md", "test2.md"]
+  },
+  "snippets": {
+    "injected": {}
+  }
 }
 EOF
     

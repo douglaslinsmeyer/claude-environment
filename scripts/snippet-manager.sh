@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Snippet Manager - Handles injection and removal of configuration snippets
-# Supports both settings.json and CLAUDE.md files
+# One snippet per target file approach
 
 set -e
 
@@ -19,72 +19,62 @@ print_warning() { echo -e "${YELLOW}⚠${NC} $1" >&2; }
 print_info() { echo -e "${BLUE}ℹ${NC} $1" >&2; }
 
 # Constants
-SNIPPET_MANIFEST=".snippet-manifest.json"
-SNIPPET_MARKER_START="__CLAUDE_SNIPPET_START__"
-SNIPPET_MARKER_END="__CLAUDE_SNIPPET_END__"
+MANIFEST_FILE=".claude-environment-manifest.json"
 
-# Get snippet directory based on repository location
-get_snippet_dir() {
-    local repo_dir="${1:-$(pwd)}"
-    echo "$repo_dir/snippets"
-}
-
-# Initialize snippet manifest
-init_manifest() {
-    local target_dir="$1"
-    local manifest_path="$target_dir/$SNIPPET_MANIFEST"
-    
-    if [[ ! -f "$manifest_path" ]]; then
-        echo '{"snippets": {}}' > "$manifest_path"
-    fi
-}
-
-# Read snippet manifest
+# Read manifest
 read_manifest() {
     local target_dir="$1"
-    local manifest_path="$target_dir/$SNIPPET_MANIFEST"
+    local manifest_path="$target_dir/$MANIFEST_FILE"
     
     if [[ -f "$manifest_path" ]]; then
         cat "$manifest_path"
     else
-        echo '{"snippets": {}}'
+        # Return empty structure if no manifest exists
+        echo '{"_meta":{"manifest_version":"1.0"},"installation":{},"snippets":{"injected":{}}}'
     fi
 }
 
-# Update snippet manifest
+# Update manifest with snippet info
 update_manifest() {
     local target_dir="$1"
-    local snippet_id="$2"
-    local snippet_data="$3"
-    local manifest_path="$target_dir/$SNIPPET_MANIFEST"
+    local target_file="$2"
+    local action="$3"  # "inject" or "remove"
+    local manifest_path="$target_dir/$MANIFEST_FILE"
     
     local current_manifest
     current_manifest=$(read_manifest "$target_dir")
     
-    # Use jq if available
-    if command -v jq >/dev/null 2>&1; then
-        echo "$current_manifest" | jq ".snippets[\"$snippet_id\"] = $snippet_data" > "$manifest_path"
-    else
+    if ! command -v jq >/dev/null 2>&1; then
         print_error "jq is required for manifest updates"
         return 1
     fi
-}
-
-# Remove snippet from manifest
-remove_from_manifest() {
-    local target_dir="$1"
-    local snippet_id="$2"
-    local manifest_path="$target_dir/$SNIPPET_MANIFEST"
     
-    local current_manifest
-    current_manifest=$(read_manifest "$target_dir")
+    local filename
+    filename=$(basename "$target_file")
     
-    if command -v jq >/dev/null 2>&1; then
-        echo "$current_manifest" | jq "del(.snippets[\"$snippet_id\"])" > "$manifest_path"
-    else
-        print_error "jq is required for manifest updates"
-        return 1
+    if [[ "$action" == "inject" ]]; then
+        # Add snippet info
+        local snippet_type="settings"
+        [[ "$filename" == "CLAUDE.md" ]] && snippet_type="claude"
+        
+        # Get version from snippet
+        local version="2.5.0"  # Default version, could extract from file
+        
+        current_manifest=$(echo "$current_manifest" | jq \
+            --arg file "$filename" \
+            --arg type "$snippet_type" \
+            --arg version "$version" \
+            '.snippets.injected[$file] = {"type": $type, "version": $version, "target_file": $file}')
+    elif [[ "$action" == "remove" ]]; then
+        # Remove snippet info
+        current_manifest=$(echo "$current_manifest" | jq \
+            --arg file "$filename" \
+            'del(.snippets.injected[$file])')
     fi
+    
+    # Write atomically
+    echo "$current_manifest" | jq '.' > "$manifest_path.tmp"
+    mv "$manifest_path.tmp" "$manifest_path"
 }
 
 # Inject settings.json snippet
@@ -93,19 +83,8 @@ inject_settings_snippet() {
     local target_file="$2"
     local dry_run="${3:-false}"
     
-    # Read snippet metadata
-    local snippet_id snippet_version snippet_settings
-    if command -v jq >/dev/null 2>&1; then
-        snippet_id=$(jq -r '.snippet_id' "$snippet_file")
-        snippet_version=$(jq -r '.snippet_version' "$snippet_file")
-        snippet_settings=$(jq -c '.settings' "$snippet_file")
-    else
-        print_error "jq is required for settings.json snippet injection"
-        return 1
-    fi
-    
     if [[ "$dry_run" == "true" ]]; then
-        print_info "Would inject snippet '$snippet_id' v$snippet_version into $target_file"
+        print_info "Would inject settings snippet into $target_file"
         return 0
     fi
     
@@ -117,26 +96,27 @@ inject_settings_snippet() {
     # Create backup
     cp "$target_file" "$target_file.backup"
     
-    # Read current settings
-    local current_settings
+    # Read current settings and snippet
+    local current_settings snippet_settings
     current_settings=$(cat "$target_file")
-    
-    # Create snippet marker comment
-    local marker_comment="\"_snippet_$snippet_id\": {\"version\": \"$snippet_version\", \"id\": \"$snippet_id\"}"
+    snippet_settings=$(cat "$snippet_file")
     
     # Merge settings
     local merged_settings
-    merged_settings=$(echo "$current_settings" | jq ". + $snippet_settings + {$marker_comment}")
+    if command -v jq >/dev/null 2>&1; then
+        merged_settings=$(echo "$current_settings" | jq ". + $snippet_settings")
+        echo "$merged_settings" | jq '.' > "$target_file"
+    else
+        print_error "jq is required for JSON merging"
+        return 1
+    fi
     
-    # Write merged settings
-    echo "$merged_settings" | jq '.' > "$target_file"
-    
-    print_success "Injected snippet '$snippet_id' v$snippet_version into $target_file"
+    print_success "Injected settings snippet into $target_file"
     
     # Update manifest
     local target_dir
     target_dir=$(dirname "$target_file")
-    update_manifest "$target_dir" "$snippet_id" "{\"type\": \"settings\", \"version\": \"$snippet_version\", \"file\": \"$(basename "$target_file")\"}"
+    update_manifest "$target_dir" "$target_file" "inject"
 }
 
 # Inject CLAUDE.md snippet
@@ -145,18 +125,8 @@ inject_claude_snippet() {
     local target_file="$2"
     local dry_run="${3:-false}"
     
-    # Extract snippet metadata from file
-    local snippet_id snippet_version
-    snippet_id=$(grep -o 'SNIPPET_START: [^ ]* ' "$snippet_file" | awk '{print $2}')
-    snippet_version=$(grep -o 'SNIPPET_START: [^ ]* [^ ]*' "$snippet_file" | awk '{print $3}')
-    
-    if [[ -z "$snippet_id" ]]; then
-        print_error "Invalid CLAUDE.md snippet format in $snippet_file"
-        return 1
-    fi
-    
     if [[ "$dry_run" == "true" ]]; then
-        print_info "Would inject snippet '$snippet_id' v$snippet_version into $target_file"
+        print_info "Would inject CLAUDE.md snippet into $target_file"
         return 0
     fi
     
@@ -166,9 +136,9 @@ inject_claude_snippet() {
     fi
     
     # Check if snippet already exists
-    if grep -q "SNIPPET_START: $snippet_id" "$target_file"; then
-        print_warning "Snippet '$snippet_id' already exists in $target_file, updating..."
-        remove_claude_snippet "$snippet_id" "$target_file"
+    if grep -q "CLAUDE-ENV-START" "$target_file"; then
+        print_warning "Snippet already exists in $target_file, updating..."
+        remove_claude_snippet "$target_file"
     fi
     
     # Create backup
@@ -179,18 +149,17 @@ inject_claude_snippet() {
     cat "$snippet_file" >> "$target_file"
     echo "" >> "$target_file"
     
-    print_success "Injected snippet '$snippet_id' v$snippet_version into $target_file"
+    print_success "Injected CLAUDE.md snippet into $target_file"
     
     # Update manifest
     local target_dir
     target_dir=$(dirname "$target_file")
-    update_manifest "$target_dir" "$snippet_id" "{\"type\": \"claude\", \"version\": \"$snippet_version\", \"file\": \"$(basename "$target_file")\"}"
+    update_manifest "$target_dir" "$target_file" "inject"
 }
 
 # Remove settings.json snippet
 remove_settings_snippet() {
-    local snippet_id="$1"
-    local target_file="$2"
+    local target_file="$1"
     
     if [[ ! -f "$target_file" ]]; then
         print_warning "Target file $target_file does not exist"
@@ -198,57 +167,29 @@ remove_settings_snippet() {
     fi
     
     if ! command -v jq >/dev/null 2>&1; then
-        print_error "jq is required for settings.json snippet removal"
+        print_error "jq is required for settings removal"
         return 1
     fi
     
     # Create backup
     cp "$target_file" "$target_file.backup"
     
-    # Get all keys associated with the snippet
-    local snippet_marker="_snippet_$snippet_id"
-    local current_settings snippet_data
+    # Remove claude-environment key
+    local current_settings
     current_settings=$(cat "$target_file")
+    echo "$current_settings" | jq 'del(."claude-environment")' > "$target_file"
     
-    # Check if snippet exists
-    if ! echo "$current_settings" | jq -e ".\"$snippet_marker\"" >/dev/null 2>&1; then
-        print_warning "Snippet '$snippet_id' not found in $target_file"
-        return 0
-    fi
-    
-    # Read original snippet to know what keys to remove
-    local snippet_dir target_dir
-    target_dir=$(dirname "$target_file")
-    snippet_dir=$(get_snippet_dir)
-    local snippet_file="$snippet_dir/settings/$snippet_id.json"
-    
-    if [[ -f "$snippet_file" ]]; then
-        # Get keys from original snippet
-        local keys_to_remove
-        keys_to_remove=$(jq -r '.settings | keys[]' "$snippet_file" 2>/dev/null || echo "")
-        
-        # Remove snippet keys and marker
-        local jq_filter="del(.\"$snippet_marker\")"
-        for key in $keys_to_remove; do
-            jq_filter="$jq_filter | del(.\"$key\")"
-        done
-        
-        echo "$current_settings" | jq "$jq_filter" > "$target_file"
-    else
-        # Just remove the marker
-        echo "$current_settings" | jq "del(.\"$snippet_marker\")" > "$target_file"
-    fi
-    
-    print_success "Removed snippet '$snippet_id' from $target_file"
+    print_success "Removed settings snippet from $target_file"
     
     # Update manifest
-    remove_from_manifest "$target_dir" "$snippet_id"
+    local target_dir
+    target_dir=$(dirname "$target_file")
+    update_manifest "$target_dir" "$target_file" "remove"
 }
 
 # Remove CLAUDE.md snippet
 remove_claude_snippet() {
-    local snippet_id="$1"
-    local target_file="$2"
+    local target_file="$1"
     
     if [[ ! -f "$target_file" ]]; then
         print_warning "Target file $target_file does not exist"
@@ -258,16 +199,20 @@ remove_claude_snippet() {
     # Create backup
     cp "$target_file" "$target_file.backup"
     
-    # Remove snippet using sed
-    sed -i.tmp "/<!-- SNIPPET_START: $snippet_id/,/<!-- SNIPPET_END: $snippet_id -->/d" "$target_file"
+    # Remove snippet using sed - everything between markers
+    sed -i.tmp '/<!-- CLAUDE-ENV-START/,/<!-- CLAUDE-ENV-END -->/d' "$target_file"
     rm -f "$target_file.tmp"
     
-    print_success "Removed snippet '$snippet_id' from $target_file"
+    # Remove any trailing blank lines
+    sed -i.tmp -e :a -e '/^\s*$/d;N;ba' "$target_file"
+    rm -f "$target_file.tmp"
+    
+    print_success "Removed CLAUDE.md snippet from $target_file"
     
     # Update manifest
     local target_dir
     target_dir=$(dirname "$target_file")
-    remove_from_manifest "$target_dir" "$snippet_id"
+    update_manifest "$target_dir" "$target_file" "remove"
 }
 
 # List installed snippets
@@ -277,60 +222,74 @@ list_snippets() {
     manifest=$(read_manifest "$target_dir")
     
     if command -v jq >/dev/null 2>&1; then
-        echo "$manifest" | jq -r '.snippets | to_entries[] | "\(.key) (v\(.value.version)) - \(.value.type) in \(.value.file)"'
+        local snippets
+        snippets=$(echo "$manifest" | jq -r '.snippets.injected | to_entries[] | "\(.key) (v\(.value.version)) - \(.value.type)"')
+        if [[ -z "$snippets" ]]; then
+            print_info "No snippets installed"
+        else
+            echo "$snippets"
+        fi
     else
-        print_warning "jq is required to list snippets properly"
+        print_warning "jq is required to list snippets"
     fi
 }
 
 # Main function
 main() {
     local action="$1"
-    local snippet_path="$2"
-    local target_path="$3"
+    local snippet_file="$2"
+    local target_file="$3"
     local dry_run="${4:-false}"
     
     case "$action" in
         inject)
-            if [[ -z "$snippet_path" || -z "$target_path" ]]; then
-                print_error "Usage: $0 inject <snippet_path> <target_path> [--dry-run]"
+            if [[ -z "$snippet_file" || -z "$target_file" ]]; then
+                print_error "Usage: $0 inject <snippet_file> <target_file> [--dry-run]"
                 exit 1
             fi
-            
-            # Initialize manifest in target directory
-            local target_dir
-            target_dir=$(dirname "$target_path")
-            init_manifest "$target_dir"
             
             # Determine snippet type and inject
-            if [[ "$snippet_path" == *.json ]]; then
-                inject_settings_snippet "$snippet_path" "$target_path" "$dry_run"
-            elif [[ "$snippet_path" == *.md ]]; then
-                inject_claude_snippet "$snippet_path" "$target_path" "$dry_run"
-            else
-                print_error "Unknown snippet type for $snippet_path"
-                exit 1
-            fi
+            local target_basename
+            target_basename=$(basename "$target_file")
+            
+            case "$target_basename" in
+                settings.json)
+                    inject_settings_snippet "$snippet_file" "$target_file" "$dry_run"
+                    ;;
+                CLAUDE.md)
+                    inject_claude_snippet "$snippet_file" "$target_file" "$dry_run"
+                    ;;
+                *)
+                    print_error "Unknown target file type: $target_basename"
+                    exit 1
+                    ;;
+            esac
             ;;
             
         remove)
-            local snippet_id="$2"
-            local target_file="$3"
-            
-            if [[ -z "$snippet_id" || -z "$target_file" ]]; then
-                print_error "Usage: $0 remove <snippet_id> <target_file>"
+            # For remove, target_file is actually in $2
+            target_file="$2"
+            if [[ -z "$target_file" ]]; then
+                print_error "Usage: $0 remove <target_file>"
                 exit 1
             fi
             
             # Determine file type and remove
-            if [[ "$target_file" == *.json ]]; then
-                remove_settings_snippet "$snippet_id" "$target_file"
-            elif [[ "$target_file" == *.md ]]; then
-                remove_claude_snippet "$snippet_id" "$target_file"
-            else
-                print_error "Unknown target file type for $target_file"
-                exit 1
-            fi
+            local target_basename
+            target_basename=$(basename "$target_file")
+            
+            case "$target_basename" in
+                settings.json)
+                    remove_settings_snippet "$target_file"
+                    ;;
+                CLAUDE.md)
+                    remove_claude_snippet "$target_file"
+                    ;;
+                *)
+                    print_error "Unknown target file type: $target_basename"
+                    exit 1
+                    ;;
+            esac
             ;;
             
         list)

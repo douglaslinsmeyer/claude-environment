@@ -63,7 +63,8 @@ teardown() {
     [ -d "$INSTALL_DIR/snippets" ]
     
     # Check that snippet files were downloaded
-    [ -f "$INSTALL_DIR/snippets/README.md" ]
+    [ -f "$INSTALL_DIR/snippets/settings.json" ]
+    [ -f "$INSTALL_DIR/snippets/CLAUDE.md" ]
 }
 
 @test "install with --no-snippets flag" {
@@ -76,21 +77,18 @@ teardown() {
 }
 
 @test "install with --no-inject flag" {
-    # Create a mock snippet manager to track calls
-    mkdir -p "$INSTALL_DIR"
-    cat > "$INSTALL_DIR/.snippet-manager.sh" << 'EOF'
-#!/bin/bash
-echo "SNIPPET_MANAGER_CALLED: $*" >&2
-exit 0
-EOF
-    chmod +x "$INSTALL_DIR/.snippet-manager.sh"
-    
     # Run installation without injection
     run main --local --no-inject --force
     [ "$status" -eq 0 ]
     
-    # Snippet manager should not have been called
-    [[ ! "$output" =~ "SNIPPET_MANAGER_CALLED" ]]
+    # Check that snippet files were downloaded but not injected
+    [ -d "$INSTALL_DIR/snippets" ]
+    [ -f "$INSTALL_DIR/snippets/settings.json" ]
+    [ -f "$INSTALL_DIR/snippets/CLAUDE.md" ]
+    
+    # Target files should not be created
+    [ ! -f "$INSTALL_DIR/settings.json" ]
+    [ ! -f "$INSTALL_DIR/CLAUDE.md" ]
 }
 
 @test "dry run with snippets" {
@@ -115,7 +113,7 @@ EOF
     
     # Check manifest includes snippets component
     if command -v jq >/dev/null 2>&1; then
-        run jq -e '.components | index("snippets")' "$INSTALL_DIR/.claude-install-manifest"
+        run jq -e '.installation.components | index("snippets")' "$INSTALL_DIR/.claude-environment-manifest.json"
         [ "$status" -eq 0 ]
     fi
 }

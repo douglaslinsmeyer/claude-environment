@@ -29,9 +29,8 @@
     "snippets": {
       "description": "Configuration snippets for settings.json and CLAUDE.md",
       "files": [
-        "./snippets/settings/*.json",
-        "./snippets/claude-md/*.md",
-        "./snippets/README.md"
+        "./snippets/settings.json",
+        "./snippets/CLAUDE.md"
       ],
       "special_mappings": {}
     }
