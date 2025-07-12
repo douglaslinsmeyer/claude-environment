@@ -177,8 +177,10 @@ EOF
     # Create manifest
     cat > "$test_dir/.claude-environment-manifest.json" << EOF
 {
-  "version": "0.9.0",
-  "files": ["commands/test.md", "CLAUDE.md"]
+  "installation": {
+    "version": "0.9.0",
+    "files": ["commands/test.md", "CLAUDE.md"]
+  }
 }
 EOF
 

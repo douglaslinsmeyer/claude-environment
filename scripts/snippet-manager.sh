@@ -145,9 +145,11 @@ inject_claude_snippet() {
     cp "$target_file" "$target_file.backup"
     
     # Append snippet to file
-    echo "" >> "$target_file"
-    cat "$snippet_file" >> "$target_file"
-    echo "" >> "$target_file"
+    {
+        echo ""
+        cat "$snippet_file"
+        echo ""
+    } >> "$target_file"
     
     print_success "Injected CLAUDE.md snippet into $target_file"
     
