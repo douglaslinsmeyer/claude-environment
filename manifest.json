@@ -2,7 +2,7 @@
   "_generated": {
     "source": "manifest-source.json",
     "source_hash": "febadff8fbb032df1def6c9e6f2c029de6d437869d2afa728b9aba3aae5428fb",
-    "timestamp": "2025-07-08T22:41:47Z"
+    "timestamp": "2025-07-12T04:33:26Z"
   },
   "components": {
     "commands": {
@@ -12,6 +12,8 @@
         "commands/analysis/research-summary.md",
         "commands/analysis/trend-analysis.md",
         "commands/coding/code-review.md",
+        "commands/coding/coding.md",
+        "commands/coding/commit.md",
         "commands/coding/debug.md",
         "commands/coding/generate-readme.md",
         "commands/coding/refactor.md",
@@ -25,12 +27,13 @@
     "personas": {
       "description": "Claude persona configurations",
       "files": [
-        "personas/cli-developer.md",
+        "personas/cli-engineer.md",
         "personas/data-analyst.md",
+        "personas/devops-engineer.md",
         "personas/product-manager.md",
+        "personas/qa-engineer.md",
         "personas/researcher.md",
-        "personas/senior-developer.md",
-        "personas/senior-devops-engineer.md",
+        "personas/software-engineer.md",
         "personas/technical-writer.md"
       ]
     },
@@ -48,5 +51,5 @@
       ]
     }
   },
-  "version": "2.5.0"
+  "version": "2.6.0"
 }

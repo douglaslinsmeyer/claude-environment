@@ -95,8 +95,10 @@ teardown() {
 
     cat > "$test_dir/.claude-environment-manifest.json" << EOF
 {
-  "version": "1.0.0",
-  "installed_at": "2024-01-01T00:00:00Z"
+  "installation": {
+    "version": "1.0.0",
+    "installed_at": "2024-01-01T00:00:00Z"
+  }
 }
 EOF
 
@@ -155,10 +157,10 @@ EOF
 
     # Verify JSON structure if jq is available
     if command -v jq >/dev/null 2>&1; then
-        version=$(jq -r '.version' "$test_dir/.claude-environment-manifest.json")
+        version=$(jq -r '.installation.version' "$test_dir/.claude-environment-manifest.json")
         [[ "$version" == "1.0.0" ]]
 
-        install_type=$(jq -r '.install_type' "$test_dir/.claude-environment-manifest.json")
+        install_type=$(jq -r '.installation.install_type' "$test_dir/.claude-environment-manifest.json")
         [[ "$install_type" == "local" ]]
     fi
 }
