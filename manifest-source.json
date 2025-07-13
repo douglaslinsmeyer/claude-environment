@@ -3,7 +3,10 @@
     "commands": {
       "description": "Claude command files for various tasks",
       "files": [
-        "./commands/**/*.md",
+        "./commands/coding/*.md",
+        "./commands/writing/*.md",
+        "./commands/analysis/*.md",
+        "./commands/persona.md",
         "!./commands/**/README.md",
         "!./commands/**/*.draft.md"
       ],
