@@ -1,8 +1,8 @@
 {
   "_generated": {
     "source": "manifest-source.json",
-    "source_hash": "febadff8fbb032df1def6c9e6f2c029de6d437869d2afa728b9aba3aae5428fb",
-    "timestamp": "2025-07-13T02:52:47Z"
+    "source_hash": "6b3480705fc9e22fcaeba0a299b1eca40f35b6cc39845edc4632cd9b30da8c8d",
+    "timestamp": "2025-07-13T03:14:36Z"
   },
   "components": {
     "commands": {
