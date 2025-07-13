@@ -13,26 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `commands/persona.md` - Command for switching between different Claude personas
 - Enhanced refactoring command with more detailed guidelines
 - Refactoring specialist persona for code improvement tasks
-
-### Changed
-- Simplified manifest-source.json command file patterns to use glob syntax
-- Reverted to explicit directory patterns for better control over included files
-
-### Fixed
-
-### Removed
-
-## [2.6.0] - 2025-07-11
-
-### Added
 - New command files:
   - `commands/coding/coding.md` - Workflow guide for development tasks
   - `commands/coding/commit.md` - Structured commit creation with conventional commits
   - `commands/shipit.md` - Shipping and deployment command
 - New persona files:
   - `personas/qa-engineer.md` - QA Engineer persona
+- Snippet injection system for configuration management
 
 ### Changed
+- Simplified manifest-source.json command file patterns to use glob syntax
+- Reverted to explicit directory patterns for better control over included files
 - Enhanced `CLAUDE.md` with comprehensive project documentation
 - Renamed personas for clarity:
   - `cli-developer.md` → `cli-engineer.md`
@@ -47,8 +38,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed test failures by updating manifest structure expectations in tests
 - Fixed command file structure to include proper YAML frontmatter
 - Aligned test expectations with actual implementation for manifest JSON structure
+- Various bug fixes for snippet injection, manifest generation, and release process
 
-## [2.5.0] - 2025-07-08
+### Removed
+
+## [2.4.0] - 2025-07-08
 
 ### Added
 - Snippet injection system for configuration management
@@ -382,9 +376,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.7.0...HEAD
-[2.7.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.6.0...v2.7.0
-[2.6.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.4.0...v2.6.0
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.5.0...HEAD
+[2.5.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.2...v2.3.0
 [2.2.2]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.0...v2.2.2
