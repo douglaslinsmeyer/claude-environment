@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.1] - 2025-07-12
+
+### Fixed
+- Aligned package.json version with VERSION file (was 2.3.0, now 2.5.1)
+- Cleaned up errant version entries in CHANGELOG
+- Removed duplicate 2.4.0 section from CHANGELOG
+- Fixed version ordering to ensure proper descending order
+
 ## [2.5.0] - 2025-07-12
 
 ### Added
@@ -68,22 +76,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Moved from `snippets/settings/*.json` to `snippets/settings.json`
   - Moved from `snippets/claude-md/*.md` to `snippets/CLAUDE.md`
   - Eliminates potential conflicts from multiple snippets per file
-
-## [2.4.0] - 2025-07-08
-
-### Added
-- Automated manifest generation system
-  - New `manifest-source.json` file using glob patterns for easier maintenance
-  - `generate-manifest.sh` script to expand globs into full file lists
-  - Support for file exclusion patterns using `!pattern` syntax
-  - Special file mappings to remap paths during installation
-  - CI/CD validation to ensure manifest.json stays in sync
-  - Deterministic output with sorted files and metadata
-  - Comprehensive error handling and verbose mode for debugging
-
-### Changed
-- Version is now read from VERSION file instead of being duplicated in manifests
-- manifest.json is now auto-generated and should not be edited manually
 
 ## [2.3.0] - 2025-07-08
 
@@ -376,7 +368,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.5.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.5.1...HEAD
+[2.5.1]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.2...v2.3.0
