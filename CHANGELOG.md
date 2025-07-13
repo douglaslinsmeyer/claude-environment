@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2025-07-12
+
+### Added
+- `commands/persona.md` - Command for switching between different Claude personas
+- Enhanced refactoring command with more detailed guidelines
+- Refactoring specialist persona for code improvement tasks
+
+### Changed
+- Simplified manifest-source.json command file patterns to use glob syntax
+- Reverted to explicit directory patterns for better control over included files
+
+### Fixed
+
+### Removed
+
 ## [2.6.0] - 2025-07-11
 
 ### Added
@@ -367,7 +382,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.6.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.4.0...v2.6.0
 [2.4.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.2...v2.3.0
