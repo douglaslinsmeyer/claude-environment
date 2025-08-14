@@ -7,21 +7,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.1] - 2025-07-12
+
+### Fixed
+- Aligned package.json version with VERSION file (was 2.3.0, now 2.5.1)
+- Cleaned up errant version entries in CHANGELOG
+- Removed duplicate 2.4.0 section from CHANGELOG
+- Fixed version ordering to ensure proper descending order
+
+## [2.5.0] - 2025-07-12
+
+### Added
+- `commands/persona.md` - Command for switching between different Claude personas
+- Enhanced refactoring command with more detailed guidelines
+- Refactoring specialist persona for code improvement tasks
+- New command files:
+  - `commands/coding/coding.md` - Workflow guide for development tasks
+  - `commands/coding/commit.md` - Structured commit creation with conventional commits
+  - `commands/shipit.md` - Shipping and deployment command
+- New persona files:
+  - `personas/qa-engineer.md` - QA Engineer persona
+- Snippet injection system for configuration management
+
+### Changed
+- Simplified manifest-source.json command file patterns to use glob syntax
+- Reverted to explicit directory patterns for better control over included files
+- Enhanced `CLAUDE.md` with comprehensive project documentation
+- Renamed personas for clarity:
+  - `cli-developer.md` → `cli-engineer.md`
+  - `senior-developer.md` → `software-engineer.md`  
+  - `senior-devops-engineer.md` → `devops-engineer.md`
+- Updated test validation rules:
+  - Command file header validation now only applies to files in `./commands` directory
+  - Removed requirement for `$ARGUMENTS` placeholder in command files (now optional)
+- Enhanced snippet files with improved memory management instructions
+
+### Fixed
+- Fixed test failures by updating manifest structure expectations in tests
+- Fixed command file structure to include proper YAML frontmatter
+- Aligned test expectations with actual implementation for manifest JSON structure
+- Various bug fixes for snippet injection, manifest generation, and release process
+
+### Removed
+
 ## [2.4.0] - 2025-07-08
 
 ### Added
-- Automated manifest generation system
-  - New `manifest-source.json` file using glob patterns for easier maintenance
-  - `generate-manifest.sh` script to expand globs into full file lists
-  - Support for file exclusion patterns using `!pattern` syntax
-  - Special file mappings to remap paths during installation
-  - CI/CD validation to ensure manifest.json stays in sync
-  - Deterministic output with sorted files and metadata
-  - Comprehensive error handling and verbose mode for debugging
+- Snippet injection system for configuration management
+  - New `snippets/` directory structure for storing configuration snippets
+  - Support for injecting snippets into `settings.json` files
+  - Support for injecting snippets into `CLAUDE.md` files
+  - `snippet-manager.sh` script for managing snippet injection and removal
+  - Automatic backup creation before modifications
+  - Support for updating existing snippets
+  - `--no-snippets` flag to skip snippet installation
+  - `--no-inject` flag to skip snippet injection
+  - Default snippets for both settings.json and CLAUDE.md
+  - Comprehensive test suite for snippet functionality
 
 ### Changed
-- Version is now read from VERSION file instead of being duplicated in manifests
-- manifest.json is now auto-generated and should not be edited manually
+- Updated installer to support snippet component
+- Added snippet processing after main installation
+- Consolidated manifests into single `.claude-environment-manifest.json` file
+  - Merged `.claude-install-manifest` and `.snippet-manifest.json`
+  - New structure with `_meta`, `installation`, and `snippets` sections
+  - Manifest is completely recreated on updates (no state migration)
+- Simplified snippet structure to one snippet per target file
+  - Moved from `snippets/settings/*.json` to `snippets/settings.json`
+  - Moved from `snippets/claude-md/*.md` to `snippets/CLAUDE.md`
+  - Eliminates potential conflicts from multiple snippets per file
 
 ## [2.3.0] - 2025-07-08
 
@@ -314,7 +368,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-platform support (macOS, Linux/WSL)
 - Comprehensive documentation
 
-[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.5.1...HEAD
+[2.5.1]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.5.0...v2.5.1
+[2.5.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.2...v2.3.0
 [2.2.2]: https://github.com/douglaslinsmeyer/claude-environment/compare/v2.2.0...v2.2.2

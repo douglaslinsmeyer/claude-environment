@@ -45,8 +45,8 @@
               "minItems": 1,
               "items": {
                 "type": "string",
-                "pattern": "^[^/].*\\.md$",
-                "description": "Relative path to a markdown file"
+                "pattern": "^[^/].*\\.(md|json)$",
+                "description": "Relative path to a file (markdown or json)"
               },
               "description": "List of files included in this component"
             },
