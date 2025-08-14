@@ -1,8 +1,8 @@
 {
   "_generated": {
     "source": "manifest-source.json",
-    "source_hash": "fb23adcb23ef3b3a95379be6df4402626a4f6c37c723ef9662a21cb08abbc618",
-    "timestamp": "2025-07-08T20:42:18Z"
+    "source_hash": "6f37ae59748e95c418060e4d3e8f743dd60d3918ce268cc5a1f6dd255e0bfb2e",
+    "timestamp": "2025-07-13T03:39:34Z"
   },
   "components": {
     "commands": {
@@ -11,11 +11,14 @@
         "commands/analysis/explore-data.md",
         "commands/analysis/research-summary.md",
         "commands/analysis/trend-analysis.md",
-        "commands/coding/code-review.md",
+        "commands/coding/code.md",
+        "commands/coding/commit.md",
         "commands/coding/debug.md",
         "commands/coding/generate-readme.md",
         "commands/coding/refactor.md",
+        "commands/coding/review.md",
         "commands/coding/write-tests.md",
+        "commands/persona.md",
         "commands/writing/blog-post.md",
         "commands/writing/documentation.md",
         "commands/writing/email-draft.md",
@@ -25,13 +28,22 @@
     "personas": {
       "description": "Claude persona configurations",
       "files": [
-        "personas/cli-developer.md",
+        "personas/cli-engineer.md",
         "personas/data-analyst.md",
+        "personas/devops-engineer.md",
         "personas/product-manager.md",
+        "personas/qa-engineer.md",
+        "personas/refactoring-specialist.md",
         "personas/researcher.md",
-        "personas/senior-developer.md",
-        "personas/senior-devops-engineer.md",
+        "personas/software-engineer.md",
         "personas/technical-writer.md"
+      ]
+    },
+    "snippets": {
+      "description": "Configuration snippets for settings.json and CLAUDE.md",
+      "files": [
+        "snippets/CLAUDE.md",
+        "snippets/settings.json"
       ]
     },
     "templates": {
@@ -41,5 +53,5 @@
       ]
     }
   },
-  "version": "2.4.0"
+  "version": "2.5.1"
 }

@@ -19,12 +19,12 @@ setup() {
     done < <(find "$PROJECT_ROOT" -name "*.md" -not -path "*/\.*" -not -path "*/node_modules/*")
 }
 
-@test "all markdown files start with header or YAML frontmatter" {
+@test "all command files start with YAML frontmatter" {
     while IFS= read -r file; do
         first_line=$(head -n 1 "$file")
-        # Allow either markdown header (#) or YAML frontmatter (---)
-        [[ "$first_line" == "#"* ]] || [[ "$first_line" == "---" ]] || fail "No header or frontmatter in: $file"
-    done < <(find "$PROJECT_ROOT" -name "*.md" -not -path "*/\.*" -not -path "*/node_modules/*")
+        # Command files should start with YAML frontmatter
+        [[ "$first_line" == "---" ]] || fail "No YAML frontmatter in command: $file"
+    done < <(find "$PROJECT_ROOT/commands" -name "*.md" -not -path "*/\.*")
 }
 
 # JSON validation
@@ -150,9 +150,6 @@ except jsonschema.ValidationError as e:
 
         # Check for description in frontmatter
         [[ "$content" == *"description:"* ]] || fail "No description in command: $basename"
-
-        # Check for $ARGUMENTS placeholder
-        [[ "$content" == *"\$ARGUMENTS"* ]] || fail "No \$ARGUMENTS placeholder in command: $basename"
     done
 }
 

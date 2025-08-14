@@ -6,6 +6,7 @@
         "./commands/coding/*.md",
         "./commands/writing/*.md",
         "./commands/analysis/*.md",
+        "./commands/persona.md",
         "!./commands/**/README.md",
         "!./commands/**/*.draft.md"
       ],
@@ -23,6 +24,14 @@
       "description": "Project and documentation templates",
       "files": [
         "./templates/*.md"
+      ],
+      "special_mappings": {}
+    },
+    "snippets": {
+      "description": "Configuration snippets for settings.json and CLAUDE.md",
+      "files": [
+        "./snippets/settings.json",
+        "./snippets/CLAUDE.md"
       ],
       "special_mappings": {}
     }

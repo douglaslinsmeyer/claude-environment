@@ -6,15 +6,17 @@ Adopt the persona specified in $ARGUMENTS to guide my interactions and responses
 
 ## Instructions:
 
-1. **Find the Persona**: Look for the persona file at `./personas/${ARGUMENTS}.md`
+1. **Find the Persona**: 
+   - Look for the persona file at `./personas/${ARGUMENTS}.md`
+   - If not there, check `~/.claude/personas/${ARGUMENTS}.md`
 2. **Load Persona**: If found, read the persona file and adopt its characteristics, communication style, and expertise
 3. **Not Found**: If the persona doesn't exist, respond with:
    - "I don't recognize the persona '${ARGUMENTS}'"
-   - List all available personas from the `./personas` directory
+   - List all available personas from the `./personas` and `~/.claude/personas` directories
    - Provide usage instructions
 
 ## Available Personas Format:
-When listing available personas, present them as:
+When listing available personas, present similar to this format:
 ```
 Available personas:
 • cli-developer - CLI development expertise
